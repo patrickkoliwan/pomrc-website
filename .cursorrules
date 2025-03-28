@@ -1,0 +1,25 @@
+# Project Patterns
+
+## Architecture
+
+- Frontend: Next.js (TypeScript, Tailwind CSS, App Router)
+- Backend: TBD
+- Communication: TBD
+
+## Directory Structure
+
+```
+pomrc-website/
+├── frontend/     # Next.js application
+├── backend/      # Backend application
+├── docs/         # Project documentation
+└── memory-bank/  # Memory bank files
+```
+
+## Development Guidelines
+
+1. TypeScript for type safety
+2. ESLint for code quality
+3. Tailwind CSS for styling
+4. Modern React patterns (hooks, server components)
+5. Clean architecture principles

@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+
+# Project Overview - This is a website built with NextJS and Tailwind CSS. Focus on clean, semantic markup and responsive layouts.
+
+# Tailwind Configuration - Set up Tailwind CSS with this custom color palette: // tailwind.config.js module.exports = { theme: { extend: { colors: { 'dark-teal': '#1f5e5b', // Primary text and accents 'light-cream': '#fbf9fa', // Main background 'deep-red': '#ae2938', // Interactive elements 'muted-teal': '#7ca8a6', // Hover and secondary accents 'light-teal': '#e9f4f4', // Subtle backgrounds }, }, }, }; - Use these custom color names in Tailwind classes (e.g., `bg-dark-teal`, `text-light-cream`).
+
+# Design Guidelines - Apply this color scheme across the website: - Primary text: `text-dark-teal` (#1f5e5b) - Background: `bg-light-cream` (#fbf9fa) - Links/buttons: `text-deep-red` (#ae2938) - Hover states: `hover:text-muted-teal` (#7ca8a6) - Highlights/secondary backgrounds: `bg-light-teal` (#e9f4f4) - Ensure good contrast for accessibility (e.g., `text-dark-teal` on `bg-light-cream`). - Leverage Tailwind’s responsive utilities (e.g., `sm:`, `md:`, `lg:`).
+
+# Coding Style - Use Tailwind classes with the custom colors in HTML: <body class="bg-light-cream text-dark-teal min-h-screen"> <a href="#" class="text-deep-red hover:text-muted-teal underline">Link</a> <button class="bg-light-cream text-deep-red border border-dark-teal px-4 py-2 hover:bg-light-teal">Click Me</button> <section class="bg-light-teal p-6">Content Area</section> </body> - Prefer utility-first approach with Tailwind (e.g., `flex items-center justify-between`).
+
+# Additional Notes - Default to these colors for all generated code unless I override them. - Warn me if accessibility issues arise (e.g., low contrast between text-muted-teal and bg-light-teal). - Use Tailwind’s state variants (e.g., hover:, focus:, active:) for interactivity.
+
