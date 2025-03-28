@@ -39,7 +39,21 @@ export default function VenueHire() {
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: formStorage.load(),
+    defaultValues: formStorage.load() || {
+      personalInfo: {
+        name: "",
+        phone: "",
+        email: "",
+      },
+      eventDetails: {
+        eventType: "",
+        expectedGuests: 0,
+      },
+      venueSelection: {
+        selectedVenue: "events-lawn",
+      },
+      termsAccepted: false,
+    },
   });
 
   const onSubmit = async (data: FormData) => {
