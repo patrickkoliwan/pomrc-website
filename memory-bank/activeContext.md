@@ -2,7 +2,7 @@
 
 ## Current Focus
 
-Setting up the foundational architecture for the full-stack application.
+Setting up the Next.js API Routes backend infrastructure and planning database integration.
 
 ## Recent Changes
 
@@ -13,18 +13,24 @@ Setting up the foundational architecture for the full-stack application.
   - ESLint
   - App Router
   - Src directory structure
+- Selected Next.js API Routes as backend solution for:
+  - Unified deployment
+  - Built-in TypeScript support
+  - Faster MVP development
+  - Future migration flexibility
 
 ## Next Steps
 
-- Choose and set up backend framework
-- Configure development environment
-- Set up communication between frontend and backend
+- Set up API directory structure and middleware
+- Choose and configure database
+- Plan authentication system
+- Implement initial API endpoints
 
 ## Current Challenges
 
-- Backend framework selection pending
-- Database design and selection pending
-- API design and structure pending
+- Database selection pending analysis
+- Authentication system design needed
+- API structure and organization planning needed
 
 ## Implementation Notes
 
@@ -38,5 +44,13 @@ Setting up the foundational architecture for the full-stack application.
 
 ### Backend
 
-- Framework selection in progress
-- Architecture planning needed
+- Selected Next.js API Routes for backend
+- Benefits:
+  - Unified deployment pipeline
+  - Built-in TypeScript support
+  - Faster initial development
+  - Option to migrate to NestJS later if needed
+- Next steps:
+  - Set up API middleware
+  - Configure database
+  - Implement authentication

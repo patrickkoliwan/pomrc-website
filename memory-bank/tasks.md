@@ -2,7 +2,30 @@
 
 ## Active Tasks
 
-[ ] Full-stack Project Setup v1.0 - [X] Create project directory structure - [X] Initialize Next.js frontend - [ ] Choose and set up backend framework - [ ] Configure development environment - [ ] Set up communication between frontend and backend - [ ] Implement initial API endpoints - [ ] Set up database - [ ] Configure deployment pipeline
+[ ] Full-stack Project Setup v1.0
+[X] Create project directory structure
+[X] Initialize Next.js frontend
+[X] Choose backend framework (Selected: Next.js API Routes)
+[ ] Set up API directory structure
+[ ] Create base API middleware
+[ ] Set up API route organization
+[ ] Add error handling middleware
+[ ] Configure development environment
+[ ] Set up environment variables
+[ ] Configure development scripts
+[ ] Set up debugging tools
+[ ] Set up database integration
+[ ] Choose database (pending analysis)
+[ ] Configure database connection
+[ ] Create initial schemas
+[ ] Implement initial API endpoints
+[ ] Authentication endpoints
+[ ] User management endpoints
+[ ] Basic CRUD operations
+[ ] Configure deployment pipeline
+[ ] Set up CI/CD
+[ ] Configure production environment
+[ ] Set up monitoring
 
 ## Completed Tasks
 

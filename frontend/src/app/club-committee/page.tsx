@@ -10,6 +10,16 @@ interface CommitteeMember {
   imageUrl: string;
 }
 
+// Function to generate initials from name
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 // Memoize the committee member card component
 const CommitteeMemberCard = memo(function CommitteeMemberCard({
   member,
@@ -18,20 +28,30 @@ const CommitteeMemberCard = memo(function CommitteeMemberCard({
   member: CommitteeMember;
   index: number;
 }) {
+  const initials = getInitials(member.name);
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow w-full max-w-[160px] sm:max-w-[180px] mx-auto">
-      <div className="relative aspect-square w-full">
-        <Image
-          src={member.imageUrl}
-          alt={member.name}
-          fill
-          className="object-cover object-center"
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
-          priority={index < 6}
-          loading={index < 6 ? "eager" : "lazy"}
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkLUEwLi0tLTAtQFBGPzpNPUBAR1hXVFdgaWZmYEVHZIhlYWf/2wBDARUXFx4aHh8eHWBQQFBnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2f/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-          placeholder="blur"
-        />
+      <div className="relative aspect-square w-full h-[160px] sm:h-[180px]">
+        {member.imageUrl ? (
+          <Image
+            src={member.imageUrl}
+            alt={member.name}
+            fill
+            className="object-cover object-center"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+            priority={index < 6}
+            loading={index < 6 ? "eager" : "lazy"}
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkLUEwLi0tLTAtQFBGPzpNPUBAR1hXVFdgaWZmYEVHZIhlYWf/2wBDARUXFx4aHh8eHWBQQFBnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2f/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            placeholder="blur"
+          />
+        ) : (
+          <div className="w-full h-full bg-light-teal flex items-center justify-center">
+            <span className="text-2xl font-bold text-dark-teal">
+              {initials}
+            </span>
+          </div>
+        )}
       </div>
       <div className="p-2 sm:p-3">
         <h3 className="text-sm sm:text-base font-semibold text-dark-teal mb-0.5 line-clamp-1">
@@ -39,6 +59,16 @@ const CommitteeMemberCard = memo(function CommitteeMemberCard({
         </h3>
         <p className="text-xs sm:text-sm text-muted-teal line-clamp-2">
           {member.position}
+          {member.name === "Anna Togolo" && (
+            <span className="block text-[10px] sm:text-xs text-muted-teal/80">
+              President PNG Squash
+            </span>
+          )}
+          {member.name === "Barbara Stubbings" && (
+            <span className="block text-[10px] sm:text-xs text-muted-teal/80">
+              President PNG Tennis
+            </span>
+          )}
         </p>
       </div>
     </div>
@@ -59,7 +89,7 @@ const committeeMembers: CommitteeMember[] = [
   {
     name: "Andrew Langley",
     position: "Treasurer",
-    imageUrl: "/images/committee/andrew-langley.jpg",
+    imageUrl: "",
   },
   {
     name: "Brett Cox",
@@ -67,7 +97,7 @@ const committeeMembers: CommitteeMember[] = [
     imageUrl: "/images/committee/brett-cox.jpg",
   },
   {
-    name: "Kathlyne Resson Tabuchi",
+    name: "Kathlyne Tabuchi",
     position: "Secretary",
     imageUrl: "/images/committee/kathlyne-resson-tabuchi.jpg",
   },
@@ -79,12 +109,12 @@ const committeeMembers: CommitteeMember[] = [
   {
     name: "Diana Hakena",
     position: "Publicity Officer",
-    imageUrl: "/images/committee/diana-hakena.jpg",
+    imageUrl: "",
   },
   {
     name: "Toby Davis",
     position: "Social Director",
-    imageUrl: "/images/committee/toby-davis.jpg",
+    imageUrl: "",
   },
   {
     name: "Iain Kaiulo",
@@ -98,12 +128,12 @@ const committeeMembers: CommitteeMember[] = [
   },
   {
     name: "Anna Togolo",
-    position: "Squash Director (President PNG Squash Federation)",
+    position: "Squash Director",
     imageUrl: "/images/committee/anna-togolo.jpg",
   },
   {
     name: "Barbara Stubbings",
-    position: "Ex Officio (President PNG Tennis Association)",
+    position: "Ex Officio",
     imageUrl: "/images/committee/barbara-stubbings.jpg",
   },
 ];
