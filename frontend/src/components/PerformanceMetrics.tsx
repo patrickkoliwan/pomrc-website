@@ -2,6 +2,12 @@
 
 import { useEffect } from "react";
 
+// Add type for LayoutShift
+type LayoutShift = PerformanceEntry & {
+  hadRecentInput: boolean;
+  value: number;
+};
+
 export default function PerformanceMetrics() {
   useEffect(() => {
     // Report Web Vitals
@@ -27,8 +33,9 @@ export default function PerformanceMetrics() {
       const clsObserver = new PerformanceObserver((entryList) => {
         let clsValue = 0;
         for (const entry of entryList.getEntries()) {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
+          const layoutShift = entry as LayoutShift;
+          if (!layoutShift.hadRecentInput) {
+            clsValue += layoutShift.value;
           }
         }
         console.log("CLS:", clsValue);
