@@ -1,19 +1,27 @@
 import { csrfUtils } from "./csrf";
 
+// Input sanitization utility
+const sanitizeInput = (input: string): string => {
+  if (typeof input !== "string") return "";
+  return input.replace(/<[^>]*>/g, "");
+};
+
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_REQUESTS = 10; // Maximum requests per window
 
 class RateLimiter {
   private requests: number[] = [];
+  private readonly limit: number = 10;
+  private readonly interval: number = 60000; // 1 minute
 
-  isAllowed(): boolean {
+  check(): boolean {
     const now = Date.now();
-    this.requests = this.requests.filter(
-      (time) => now - time < RATE_LIMIT_WINDOW
-    );
-    if (this.requests.length >= MAX_REQUESTS) {
-      return false;
+    this.requests = this.requests.filter((time) => now - time < this.interval);
+
+    if (this.requests.length >= this.limit) {
+      throw new Error("Too many requests. Please try again later.");
     }
+
     this.requests.push(now);
     return true;
   }
@@ -30,18 +38,40 @@ export class ApiError extends Error {
 
 export const api = {
   async submitVenueHireForm(data: any) {
-    if (!rateLimiter.isAllowed()) {
-      throw new ApiError(429, "Too many requests. Please try again later.");
-    }
+    // Rate limiting check
+    rateLimiter.check();
+
+    // Sanitize input data
+    const sanitizedData = {
+      personalInfo: {
+        name: sanitizeInput(data.personalInfo.name),
+        email: sanitizeInput(data.personalInfo.email),
+        phone: sanitizeInput(data.personalInfo.phone),
+      },
+      eventDetails: {
+        eventType: sanitizeInput(data.eventDetails.eventType),
+        expectedGuests: Number(data.eventDetails.expectedGuests),
+      },
+      venueSelection: {
+        venue: sanitizeInput(data.venueSelection.venue),
+      },
+      termsAccepted: Boolean(data.termsAccepted),
+    };
+
+    // Setup request timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     try {
       const response = await fetch("/api/venue-hire", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "CSRF-Token": csrfUtils.getToken(),
+          "CSRF-Token": csrfUtils.getToken() || "",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(sanitizedData),
+        signal: controller.signal,
+        credentials: "same-origin",
       });
 
       if (!response.ok) {
@@ -57,6 +87,8 @@ export const api = {
         500,
         "An unexpected error occurred. Please try again."
       );
+    } finally {
+      clearTimeout(timeoutId);
     }
   },
 };
