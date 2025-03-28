@@ -71,7 +71,7 @@ const membershipFormSchema = z.object({
   }),
 });
 
-type MembershipFormData = z.infer<typeof membershipFormSchema>;
+export type MembershipFormData = z.infer<typeof membershipFormSchema>;
 
 const MEMBERSHIP_TYPES = {
   FAMILY: {
