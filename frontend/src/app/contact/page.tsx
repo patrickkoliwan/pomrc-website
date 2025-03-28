@@ -4,10 +4,14 @@ import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 
+interface GoogleMapProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
+  className?: string;
+}
+
 // Lazy load the map component
 const GoogleMap = dynamic(
   () =>
-    Promise.resolve(({ className, ...props }: any) => (
+    Promise.resolve(({ className, ...props }: GoogleMapProps) => (
       <div className={`aspect-w-16 aspect-h-12 ${className}`}>
         <iframe {...props} className="rounded-md" />
       </div>
@@ -90,8 +94,17 @@ export default function Contact() {
       };
 
       // Here you would typically send the data to your backend
-      // For now, we'll simulate a successful submission
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sanitizedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit form");
+      }
 
       setSubmitStatus("success");
       reset();

@@ -12,7 +12,7 @@ export default function Events() {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Join us for exciting weekly activities and special events at Port
             Moresby Racquet Club. From social sports to live entertainment,
-            there's something for everyone!
+            there&apos;s something for everyone!
           </p>
         </div>
 
