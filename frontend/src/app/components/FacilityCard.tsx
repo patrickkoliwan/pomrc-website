@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { memo } from "react";
 
 interface FacilityCardProps {
   title: string;
@@ -7,7 +8,7 @@ interface FacilityCardProps {
   priority?: boolean;
 }
 
-export default function FacilityCard({
+const FacilityCard = memo(function FacilityCard({
   title,
   description,
   imageUrl,
@@ -22,6 +23,7 @@ export default function FacilityCard({
           alt={title}
           fill
           priority={priority}
+          loading={priority ? "eager" : "lazy"}
           quality={85}
           className="object-cover transform group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -30,11 +32,15 @@ export default function FacilityCard({
         />
       </div>
       <div className="p-6 border-t border-gray-100 bg-gray-100">
-        <h3 className="text-xl font-semibold text-dark-teal mb-3 group-hover:text-deep-red transition-colors duration-300">
+        <h3 className="text-xl font-semibold text-dark-teal mb-3 group-hover:text-deep-red transition-colors duration-300 min-h-[3.5rem] flex items-center">
           {title}
         </h3>
         <p className="text-muted-teal leading-relaxed">{description}</p>
       </div>
     </div>
   );
-}
+});
+
+FacilityCard.displayName = "FacilityCard";
+
+export default FacilityCard;

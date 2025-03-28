@@ -2,7 +2,22 @@ import FacilityCard from "../components/FacilityCard";
 import MobileContentsMenu from "../components/MobileContentsMenu";
 import { facilities, Facility } from "@/data/facilities";
 
+// Enable static generation
+export const metadata = {
+  generateStaticParams: true,
+};
+
+// Mark page as static
+export const dynamic = "force-static";
+
+// Add revalidation period (e.g., rebuild page every 24 hours)
+export const revalidate = 86400; // 24 hours
+
 export default function Facilities() {
+  // Pre-calculate prioritized facilities for better performance
+  const isPrioritized = (id: string) =>
+    id === "southern-courts" || id === "northern-courts";
+
   return (
     <main className="min-h-screen bg-light-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -16,10 +31,7 @@ export default function Facilities() {
                 title={facility.title}
                 description={facility.description}
                 imageUrl={facility.imageUrl}
-                priority={
-                  facility.id === "southern-courts" ||
-                  facility.id === "northern-courts"
-                } // Prioritize first visible images
+                priority={isPrioritized(facility.id)}
               />
             </div>
           ))}
@@ -27,7 +39,10 @@ export default function Facilities() {
       </div>
 
       <MobileContentsMenu
-        items={facilities.map((f: Facility) => ({ title: f.title, id: f.id }))}
+        items={facilities.map((f: Facility) => ({
+          title: f.title,
+          id: f.id,
+        }))}
       />
     </main>
   );
