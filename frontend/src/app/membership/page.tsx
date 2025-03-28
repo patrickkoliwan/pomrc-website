@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamic imports
@@ -118,9 +118,14 @@ export default function Membership() {
   const membershipStatus = watch("membershipStatus");
   const membershipType = watch("membershipType");
 
-  const onSubmit = (data: MembershipFormData) => {
-    console.log(data);
-    // Handle form submission here
+  const onSubmit = async (data: MembershipFormData) => {
+    try {
+      setIsLoading(true);
+      console.log(data);
+      // Handle form submission here
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
