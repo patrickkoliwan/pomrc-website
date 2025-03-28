@@ -25,7 +25,7 @@ const formSchema = z.object({
   }),
 });
 
-type FormData = z.infer<typeof formSchema>;
+export type FormData = z.infer<typeof formSchema>;
 
 export default function VenueHire() {
   const [isSubmitting, setIsSubmitting] = useState(false);
