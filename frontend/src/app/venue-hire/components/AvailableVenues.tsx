@@ -1,4 +1,3 @@
-import FacilityCard from "../../components/FacilityCard";
 import LoadingSpinner from "./LoadingSpinner";
 import Image from "next/image";
 

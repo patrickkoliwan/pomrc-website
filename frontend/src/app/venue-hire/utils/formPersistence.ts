@@ -1,7 +1,9 @@
+import { FormData } from "../page";
+
 const FORM_STORAGE_KEY = "venue-hire-form-data";
 
 export const formStorage = {
-  save: (data: any) => {
+  save: (data: FormData) => {
     try {
       localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
@@ -9,7 +11,7 @@ export const formStorage = {
     }
   },
 
-  load: () => {
+  load: (): FormData | null => {
     try {
       const data = localStorage.getItem(FORM_STORAGE_KEY);
       return data ? JSON.parse(data) : null;

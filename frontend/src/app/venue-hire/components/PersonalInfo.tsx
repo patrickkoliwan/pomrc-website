@@ -1,6 +1,7 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import LoadingSpinner from "./LoadingSpinner";
+import { FormData } from "../page";
 
 // Validation schema
 export const personalInfoSchema = z.object({
@@ -12,8 +13,8 @@ export const personalInfoSchema = z.object({
 export type PersonalInfoData = z.infer<typeof personalInfoSchema>;
 
 interface PersonalInfoProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<FormData>;
+  errors: FieldErrors<FormData>;
   isLoading?: boolean;
 }
 

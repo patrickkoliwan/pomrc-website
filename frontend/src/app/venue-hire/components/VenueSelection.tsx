@@ -2,6 +2,7 @@ import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import LoadingSpinner from "./LoadingSpinner";
 import Image from "next/image";
+import { FormData } from "../page";
 
 // Validation schema
 export const venueSelectionSchema = z.object({
@@ -13,8 +14,8 @@ export const venueSelectionSchema = z.object({
 export type VenueSelectionData = z.infer<typeof venueSelectionSchema>;
 
 interface VenueSelectionProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<FormData>;
+  errors: FieldErrors<FormData>;
   isLoading?: boolean;
 }
 

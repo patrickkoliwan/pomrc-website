@@ -1,14 +1,15 @@
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
 import { z } from "zod";
 import LoadingSpinner from "./LoadingSpinner";
+import { MembershipFormData } from "../page";
 
 export const membershipStatusSchema = z.enum(["new", "renewal"]);
 
 export type MembershipStatusData = z.infer<typeof membershipStatusSchema>;
 
 interface MembershipStatusProps {
-  register: UseFormRegister<any>;
-  watch: UseFormWatch<any>;
+  register: UseFormRegister<MembershipFormData>;
+  watch: UseFormWatch<MembershipFormData>;
   isLoading?: boolean;
 }
 
@@ -18,8 +19,6 @@ export default function MembershipStatus({
   isLoading = false,
 }: MembershipStatusProps) {
   if (isLoading) return <LoadingSpinner />;
-
-  const membershipStatus = watch("membershipStatus");
 
   return (
     <section className="bg-white p-6 rounded-lg shadow-md">

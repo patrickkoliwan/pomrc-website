@@ -2,10 +2,11 @@ import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { useState } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 import Modal from "./Modal";
+import { FormData } from "../page";
 
 interface TermsAndConditionsProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<FormData>;
+  errors: FieldErrors<FormData>;
   isLoading?: boolean;
 }
 
@@ -68,6 +69,11 @@ export default function TermsAndConditions({
             {errors.termsAccepted.message as string}
           </p>
         )}
+
+        <p className="text-dark-teal mb-4">
+          The hirer agrees to &ldquo;make good&rdquo; any damage caused to the
+          facility during the hire period.
+        </p>
       </div>
 
       {/* Full Terms Modal */}

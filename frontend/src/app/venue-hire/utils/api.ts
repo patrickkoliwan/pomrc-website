@@ -1,4 +1,5 @@
 import { csrfUtils } from "./csrf";
+import { FormData } from "../page";
 
 // Input sanitization utility
 const sanitizeInput = (input: string): string => {
@@ -37,58 +38,23 @@ export class ApiError extends Error {
 }
 
 export const api = {
-  async submitVenueHireForm(data: any) {
-    // Rate limiting check
-    rateLimiter.check();
-
-    // Sanitize input data
-    const sanitizedData = {
-      personalInfo: {
-        name: sanitizeInput(data.personalInfo.name),
-        email: sanitizeInput(data.personalInfo.email),
-        phone: sanitizeInput(data.personalInfo.phone),
-      },
-      eventDetails: {
-        eventType: sanitizeInput(data.eventDetails.eventType),
-        expectedGuests: Number(data.eventDetails.expectedGuests),
-      },
-      venueSelection: {
-        venue: sanitizeInput(data.venueSelection.venue),
-      },
-      termsAccepted: Boolean(data.termsAccepted),
-    };
-
-    // Setup request timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
+  async submitVenueHireForm(data: FormData) {
     try {
       const response = await fetch("/api/venue-hire", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "CSRF-Token": csrfUtils.getToken() || "",
         },
-        body: JSON.stringify(sanitizedData),
-        signal: controller.signal,
-        credentials: "same-origin",
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        throw new ApiError(response.status, await response.text());
+        throw new Error(await response.text());
       }
 
       return await response.json();
     } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(
-        500,
-        "An unexpected error occurred. Please try again."
-      );
-    } finally {
-      clearTimeout(timeoutId);
+      throw error;
     }
   },
 };

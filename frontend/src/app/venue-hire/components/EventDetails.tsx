@@ -1,6 +1,7 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import LoadingSpinner from "./LoadingSpinner";
+import { FormData } from "../page";
 
 // Validation schema
 export const eventDetailsSchema = z.object({
@@ -14,8 +15,8 @@ export const eventDetailsSchema = z.object({
 export type EventDetailsData = z.infer<typeof eventDetailsSchema>;
 
 interface EventDetailsProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<FormData>;
+  errors: FieldErrors<FormData>;
   isLoading?: boolean;
 }
 

@@ -1,9 +1,10 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import LoadingSpinner from "./LoadingSpinner";
+import { MembershipFormData } from "../page";
 
 interface DeclarationProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<MembershipFormData>;
+  errors: FieldErrors<MembershipFormData>;
   isLoading?: boolean;
 }
 

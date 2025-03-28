@@ -1,4 +1,5 @@
 import { csrfUtils } from "./csrf";
+import { MembershipFormData } from "../page";
 
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_REQUESTS = 10; // Maximum requests per window
@@ -29,7 +30,7 @@ export class ApiError extends Error {
 }
 
 export const api = {
-  async submitMembershipForm(data: any) {
+  async submitMembershipForm(data: MembershipFormData) {
     if (!rateLimiter.isAllowed()) {
       throw new ApiError(429, "Too many requests. Please try again later.");
     }
