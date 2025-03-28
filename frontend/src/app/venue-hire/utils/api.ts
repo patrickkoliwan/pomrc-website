@@ -1,4 +1,3 @@
-import { csrfUtils } from "./csrf";
 import { FormData } from "../page";
 
 // Input sanitization utility

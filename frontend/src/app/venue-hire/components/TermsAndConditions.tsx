@@ -122,8 +122,8 @@ export default function TermsAndConditions({
               remain on POMRC property.
             </li>
             <li>
-              Purchases from The Bar will be on a "pay as you go" basis only.
-              Credit is not allowed.
+              Purchases from The Bar will be on a &quot;pay as you go&quot;
+              basis only. Credit is not allowed.
             </li>
             <li>
               All alcoholic & non-alcoholic drinks are TO BE PURCHASED AT THE
