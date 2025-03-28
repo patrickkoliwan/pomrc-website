@@ -8,6 +8,12 @@ type LayoutShift = PerformanceEntry & {
   value: number;
 };
 
+// Add type for FirstInputEntry
+type FirstInputEntry = PerformanceEntry & {
+  processingStart: number;
+  startTime: number;
+};
+
 export default function PerformanceMetrics() {
   useEffect(() => {
     // Report Web Vitals
@@ -45,7 +51,11 @@ export default function PerformanceMetrics() {
       // First Input Delay
       const fidObserver = new PerformanceObserver((entryList) => {
         for (const entry of entryList.getEntries()) {
-          console.log("FID:", entry.processingStart - entry.startTime);
+          const firstInput = entry as FirstInputEntry;
+          console.log(
+            "FID:",
+            firstInput.processingStart - firstInput.startTime
+          );
         }
       });
       fidObserver.observe({ entryTypes: ["first-input"] });
