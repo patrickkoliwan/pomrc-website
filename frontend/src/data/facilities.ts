@@ -17,7 +17,7 @@ export const facilities: Facility[] = [
     id: "northern-courts",
     title: "Northern Tennis Courts (5-7)",
     description:
-      "Enjoy seamless gameplay on our three immaculately maintained synthetic grass courts, facing the northern carpark. Set on a single level, these courts provide the ideal setting for both practice sessions and thrilling matches with a.",
+      "Enjoy seamless gameplay on our three immaculately maintained synthetic grass courts, facing the northern carpark. Set on a single level, these courts provide the ideal setting for both practice sessions and thrilling matches.",
     imageUrl: "/northern-courts.jpg",
   },
   {
