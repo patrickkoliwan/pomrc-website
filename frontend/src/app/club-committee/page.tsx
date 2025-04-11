@@ -89,7 +89,7 @@ const committeeMembers: CommitteeMember[] = [
   {
     name: "Andrew Langley",
     position: "Treasurer",
-    imageUrl: "",
+    imageUrl: "/images/committee/andrew-langley.jpg",
   },
   {
     name: "Brett Cox",
@@ -104,7 +104,7 @@ const committeeMembers: CommitteeMember[] = [
   {
     name: "Adelaide Senior",
     position: "Assistant Secretary",
-    imageUrl: "/images/committee/adelaide-senior.jpg",
+    imageUrl: "/images/committee/adelaide-senior.webp",
   },
   {
     name: "Diana Hakena",
