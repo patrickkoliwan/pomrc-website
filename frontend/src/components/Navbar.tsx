@@ -46,6 +46,12 @@ const Navbar = () => {
             Facilities
           </Link>
           <Link
+            href="/about"
+            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
+          >
+            About
+          </Link>
+          <Link
             href="/events"
             className="text-light-cream hover:text-muted-teal transition-colors text-lg"
           >
@@ -133,6 +139,12 @@ const Navbar = () => {
             className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
           >
             Facilities
+          </Link>
+          <Link
+            href="/about"
+            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
+          >
+            About
           </Link>
           <Link
             href="/events"
