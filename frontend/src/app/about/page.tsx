@@ -37,7 +37,7 @@ export default function About() {
       src: "/images/tennis-advanced-2.jpg",
       alt: "POMRC Open Tournament",
       caption:
-        "The POMRC Open is PNG's most prestigious tennis and squash competition",
+        "The POMRC Open is PNG&apos;s most prestigious tennis and squash competition",
     },
   ];
 
@@ -57,9 +57,9 @@ export default function About() {
             <p className="mb-6 text-lg">
               The Port Moresby Racquets Club officially debuted during the
               spectacular Pacific Games Opening Ceremony on July 4th, 2015. As
-              part of this landmark event's Legacy Agreement, the club underwent
-              a remarkable transformation, establishing itself as a premier
-              sporting destination in Port Moresby.
+              part of this landmark event&apos;s Legacy Agreement, the club
+              underwent a remarkable transformation, establishing itself as a
+              premier sporting destination in Port Moresby.
             </p>
 
             <p className="mb-10 text-lg">
@@ -73,12 +73,12 @@ export default function About() {
             </h2>
 
             <p className="mb-10 text-lg">
-              Since 2016, the POMRC Open has evolved into PNG's most prestigious
-              tennis and squash competition. Now in its 9th year (with a pause
-              in 2020 due to the Covid-19 pandemic), this signature event serves
-              as an official ranking tournament for Team PNG selection,
-              highlighting our commitment to developing elite sporting talent
-              across the nation.
+              Since 2016, the POMRC Open has evolved into PNG&apos;s most
+              prestigious tennis and squash competition. Now in its 9th year
+              (with a pause in 2020 due to the Covid-19 pandemic), this
+              signature event serves as an official ranking tournament for Team
+              PNG selection, highlighting our commitment to developing elite
+              sporting talent across the nation.
             </p>
           </div>
         </div>

@@ -58,8 +58,9 @@ export default function JuniorPrograms() {
                 (WPQ), which begin at the under-12 category. Success at the WPQ
                 opens doors to the Pacific Oceania Junior Championships, where
                 top finishers may qualify for further opportunities in Pacific
-                Oceania junior touring events. Join us to start your child's
-                journey toward tennis excellence on the international stage.
+                Oceania junior touring events. Join us to start your
+                child&apos;s journey toward tennis excellence on the
+                international stage.
               </p>
             </div>
           </div>
@@ -91,7 +92,7 @@ export default function JuniorPrograms() {
                 Juniors have proudly represented PNG at the 2018 Commonwealth
                 Games, 2019 Pacific Games, and 2022 Birmingham Commonwealth
                 Games. Endorsed by the PNG Squash Rackets Federation, our
-                program is your child's gateway to sporting excellence.
+                program is your child&apos;s gateway to sporting excellence.
               </p>
             </div>
           </div>
