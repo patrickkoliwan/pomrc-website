@@ -91,7 +91,7 @@ export default function VenueHireFormModalContent({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
         <PersonalInfo register={register} errors={errors} />
-        <EventDetails register={register} errors={errors} watch={watch} />
+        <EventDetails register={register} errors={errors} />
         <VenueSelection register={register} errors={errors} />
         <TermsAcceptance register={register} errors={errors} />
       </div>
