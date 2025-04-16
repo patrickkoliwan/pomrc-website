@@ -24,28 +24,16 @@ export const juniorPrograms: JuniorProgram[] = [
     imageUrl: "/images/junior-programs/squash-beginners.jpg", // Placeholder image path
   },
   {
-    id: "saturday-beginners-tennis",
-    title: "Saturday Beginners Tennis (Red Ball)",
+    id: "saturday-junior-tennis",
+    title: "Saturday Junior Tennis",
     description:
-      "Perfect for young beginners starting their tennis journey. Using red balls for easier learning.",
+      "Combined Saturday tennis program. Beginners (Red Ball) focus on fundamentals, while Intermediate & Advanced players work on technique and match play.",
     date: "Saturday",
-    time: "8:00 AM - 9:30 AM",
+    time: "Beginners (Red Ball): 8:00 AM - 9:30 AM | Intermediate & Advanced: 9:30 AM - 11:00 AM",
     location: "Tennis Courts",
     isWeekly: true,
     price: "K10 per child",
-    imageUrl: "/images/junior-programs/tennis-red-ball.jpg", // Placeholder image path
-  },
-  {
-    id: "saturday-advanced-tennis",
-    title: "Saturday Intermediate & Advanced Tennis",
-    description:
-      "For progressing players using green and yellow balls. Focus on technique and match play.",
-    date: "Saturday",
-    time: "9:30 AM - 11:00 AM",
-    location: "Tennis Courts",
-    isWeekly: true,
-    price: "K10 per child",
-    imageUrl: "/images/junior-programs/tennis-advanced.jpg", // Placeholder image path
+    imageUrl: "/images/junior-programs/tennis-red-ball.jpg", // Reusing beginners image for now
   },
   {
     id: "wednesday-teenage-tennis",
@@ -60,27 +48,15 @@ export const juniorPrograms: JuniorProgram[] = [
     imageUrl: "/images/junior-programs/teenage-tennis.jpg", // Placeholder image path
   },
   {
-    id: "tuesday-thursday-beginners",
-    title: "Tuesday & Thursday Beginners Tennis",
+    id: "tuesday-thursday-junior-tennis",
+    title: "Tuesday & Thursday Junior Tennis",
     description:
-      "Twice-weekly tennis program for beginners, focusing on fundamental skills and fun.",
+      "Twice-weekly junior tennis covering fundamentals for beginners and technique/strategy for advanced players.",
     date: "Tuesday & Thursday",
-    time: "4:00 PM - 5:00 PM",
+    time: "Beginners: 4:00 PM - 5:00 PM | Advanced: 5:00 PM - 6:00 PM",
     location: "Tennis Courts",
     isWeekly: true,
     price: "K10 per child",
-    imageUrl: "/images/junior-programs/tennis-beginners.jpg", // Placeholder image path
-  },
-  {
-    id: "tuesday-thursday-advanced",
-    title: "Tuesday & Thursday Advanced Tennis",
-    description:
-      "Advanced tennis training sessions focusing on technique, strategy, and match play.",
-    date: "Tuesday & Thursday",
-    time: "5:00 PM - 6:00 PM",
-    location: "Tennis Courts",
-    isWeekly: true,
-    price: "K10 per child",
-    imageUrl: "/images/junior-programs/tennis-advanced-2.jpg", // Placeholder image path
+    imageUrl: "/images/junior-programs/tennis-beginners.jpg", // Reusing beginners image
   },
 ];

@@ -40,16 +40,16 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-8">
           <Link
-            href="/facilities"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Facilities
-          </Link>
-          <Link
             href="/about"
             className="text-light-cream hover:text-muted-teal transition-colors text-lg"
           >
             About
+          </Link>
+          <Link
+            href="/facilities"
+            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
+          >
+            Facilities
           </Link>
           <Link
             href="/events"
@@ -135,16 +135,16 @@ const Navbar = () => {
         </button>
         <div className="flex flex-col items-center justify-center h-full space-y-8">
           <Link
-            href="/facilities"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Facilities
-          </Link>
-          <Link
             href="/about"
             className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
           >
             About
+          </Link>
+          <Link
+            href="/facilities"
+            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
+          >
+            Facilities
           </Link>
           <Link
             href="/events"

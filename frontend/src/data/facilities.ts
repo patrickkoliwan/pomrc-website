@@ -10,8 +10,8 @@ export const facilities: Facility[] = [
     id: "southern-courts",
     title: "Southern Tennis Courts (1-4)",
     description:
-      "Experience the perfect game on our beautifully terraced synthetic grass courts. These four premium courts offer professional-grade synthetic grass surfaces for both casual matches and competitive play.",
-    imageUrl: "/southern-courts.jpg",
+      "Play the perfect game on our beautifully terraced synthetic grass courts. These four premium courts offer professional-grade synthetic grass surfaces for both casual matches and competitive play.",
+    imageUrl: "/southern-court.jpg",
   },
   {
     id: "northern-courts",

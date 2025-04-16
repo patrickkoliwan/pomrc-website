@@ -3,11 +3,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PersonalInfo, { personalInfoSchema } from "./components/PersonalInfo";
 import EventDetails, { eventDetailsSchema } from "./components/EventDetails";
 import VenueInfo from "./components/VenueInfo";
-import TermsAndConditions from "./components/TermsAndConditions";
+import TermsDisplay from "./components/TermsDisplay";
 import VenueHireSteps from "./components/VenueHireSteps";
 import AvailableVenues from "./components/AvailableVenues";
 import VenueSelection, {
@@ -15,6 +15,17 @@ import VenueSelection, {
 } from "./components/VenueSelection";
 import { formStorage } from "./utils/formPersistence";
 import { api } from "./utils/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
+import VenueHireFormModalContent from "./components/VenueHireFormModalContent";
 
 const formSchema = z.object({
   personalInfo: personalInfoSchema,
@@ -28,32 +39,37 @@ const formSchema = z.object({
 export type FormData = z.infer<typeof formSchema>;
 
 export default function VenueHire() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: formStorage.load() || {
-      personalInfo: {
-        name: "",
-        phone: "",
-        email: "",
-      },
-      eventDetails: {
-        eventType: "",
-        expectedGuests: 0,
-      },
-      venueSelection: {
-        selectedVenue: "events-lawn",
-      },
-      termsAccepted: false,
-    },
+    defaultValues: isClient
+      ? formStorage.load() || {
+          personalInfo: { name: "", phone: "", email: "" },
+          eventDetails: { eventType: "", expectedGuests: 0 },
+          venueSelection: { selectedVenue: "events-lawn" },
+          termsAccepted: false,
+        }
+      : {
+          personalInfo: { name: "", phone: "", email: "" },
+          eventDetails: { eventType: "", expectedGuests: 0 },
+          venueSelection: { selectedVenue: "events-lawn" },
+          termsAccepted: false,
+        },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -64,6 +80,8 @@ export default function VenueHire() {
       await api.submitVenueHireForm(data);
       setSubmitSuccess(true);
       formStorage.clear();
+      reset();
+      setIsModalOpen(false);
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : "An error occurred"
@@ -73,25 +91,35 @@ export default function VenueHire() {
     }
   };
 
-  // Save form data on change
-  const formData = watch();
-  formStorage.save(formData);
+  const watchedData = watch();
+  useEffect(() => {
+    if (isClient) {
+      formStorage.save(watchedData);
+    }
+  }, [watchedData, isClient]);
 
   if (submitSuccess) {
     return (
       <main className="min-h-screen bg-light-cream py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h2 className="text-2xl font-semibold text-dark-teal mb-4">
-              Venue Hire Request Submitted
+              Venue Hire Request Submitted!
             </h2>
             <p className="text-dark-teal mb-4">
-              Thank you for your venue hire request. We will review your
-              application and contact you shortly.
+              Thank you for your venue hire request. We have received your
+              details and will review your application shortly.
             </p>
-            <p className="text-dark-teal">
-              Please proceed with the payment to confirm your booking.
+            <p className="text-dark-teal font-medium">
+              Please note: Your booking is confirmed only upon receipt of
+              payment.
             </p>
+            <button
+              onClick={() => setSubmitSuccess(false)}
+              className="mt-6 bg-dark-teal text-light-cream py-2 px-4 rounded-md font-medium hover:bg-muted-teal transition-colors"
+            >
+              Make Another Request
+            </button>
           </div>
         </div>
       </main>
@@ -100,56 +128,47 @@ export default function VenueHire() {
 
   return (
     <main className="min-h-screen bg-light-cream py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-dark-teal mb-8">Venue Hire</h1>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <h1 className="text-4xl font-bold text-dark-teal mb-8 text-center">
+          Venue Hire at POMRC
+        </h1>
 
         <VenueHireSteps />
+        <AvailableVenues isLoading={false} />
+        <VenueInfo isLoading={false} />
+        <TermsDisplay />
 
-        <div className="my-8">
-          <AvailableVenues isLoading={isSubmitting} />
+        <div className="text-center pt-4">
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <button className="bg-deep-red text-light-cream py-3 px-8 rounded-md font-semibold text-lg hover:bg-deep-red/80 transition-colors shadow-md">
+                Submit Venue Hire Request
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-light-cream">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-semibold text-dark-teal">
+                  Venue Hire Request Form
+                </DialogTitle>
+                <DialogDescription className="text-muted-teal">
+                  Please fill out the details below to request a venue booking.
+                </DialogDescription>
+              </DialogHeader>
+
+              <VenueHireFormModalContent
+                register={register}
+                errors={errors}
+                handleSubmit={handleSubmit}
+                watch={watch}
+                onSubmit={onSubmit}
+                isSubmitting={isSubmitting}
+                isLoading={!isClient}
+                submitError={submitError}
+                onClose={() => setIsModalOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <PersonalInfo
-            register={register}
-            errors={errors}
-            isLoading={isSubmitting}
-          />
-
-          <EventDetails
-            register={register}
-            errors={errors}
-            isLoading={isSubmitting}
-          />
-
-          <VenueSelection
-            register={register}
-            errors={errors}
-            isLoading={isSubmitting}
-          />
-
-          <VenueInfo isLoading={isSubmitting} />
-
-          <TermsAndConditions
-            register={register}
-            errors={errors}
-            isLoading={isSubmitting}
-          />
-
-          {submitError && (
-            <div className="bg-deep-red/10 text-deep-red p-4 rounded-md">
-              {submitError}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-dark-teal text-light-cream py-3 px-6 rounded-md font-medium hover:bg-muted-teal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? "Submitting..." : "Submit Venue Hire Request"}
-          </button>
-        </form>
       </div>
     </main>
   );

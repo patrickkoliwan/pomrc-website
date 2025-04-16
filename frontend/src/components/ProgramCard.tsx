@@ -47,9 +47,22 @@ export default function ProgramCard({
             </span>
           </div>
 
-          <div className="flex items-center bg-light-teal/10 py-1.5 px-2 rounded-lg">
-            <FaClock className="h-5 w-5 mr-3 text-dark-teal" />
-            <span className="font-medium text-sm">{program.time}</span>
+          <div className="flex items-start bg-light-teal/10 py-1.5 px-2 rounded-lg">
+            <FaClock className="h-5 w-5 mr-3 text-dark-teal mt-0.5" />
+            <div>
+              {program.time.includes(" | ") ? (
+                program.time.split(" | ").map((timeSlot, index) => (
+                  <span
+                    key={index}
+                    className="block font-medium text-sm mb-1 last:mb-0"
+                  >
+                    {timeSlot.trim()}
+                  </span>
+                ))
+              ) : (
+                <span className="font-medium text-sm">{program.time}</span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center bg-light-teal/10 py-1.5 px-2 rounded-lg">
