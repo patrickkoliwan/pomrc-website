@@ -1,5 +1,5 @@
 import { csrfUtils } from "./csrf";
-import { MembershipFormData } from "../page";
+import { MembershipFormData } from "../components/MembershipFormModal";
 
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_REQUESTS = 10; // Maximum requests per window
