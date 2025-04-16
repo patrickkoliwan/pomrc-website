@@ -5,7 +5,6 @@ import {
   UseFormRegister,
   FieldErrors,
   UseFormHandleSubmit,
-  UseFormWatch,
 } from "react-hook-form";
 import { FormData } from "../page";
 import PersonalInfo from "./PersonalInfo";
@@ -21,7 +20,6 @@ interface VenueHireFormModalContentProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   handleSubmit: UseFormHandleSubmit<FormData>;
-  watch: UseFormWatch<FormData>;
   onSubmit: (data: FormData) => Promise<void>;
   isSubmitting: boolean;
   isLoading: boolean;
@@ -33,7 +31,6 @@ export default function VenueHireFormModalContent({
   register,
   errors,
   handleSubmit,
-  watch,
   onSubmit,
   isSubmitting,
   isLoading,
