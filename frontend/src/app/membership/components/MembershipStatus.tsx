@@ -1,7 +1,7 @@
-import { UseFormRegister } from "react-hook-form";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import LoadingSpinner from "./LoadingSpinner";
-import { MembershipFormData } from "../page";
+import { MembershipFormData } from "./MembershipFormModal";
 
 export const membershipStatusSchema = z.enum(["new", "renewal"]);
 

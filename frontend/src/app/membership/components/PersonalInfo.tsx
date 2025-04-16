@@ -1,7 +1,7 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { z } from "zod";
 import LoadingSpinner from "./LoadingSpinner";
-import { MembershipFormData } from "../page";
+import { MembershipFormData } from "./MembershipFormModal";
 
 // Validation schema
 export const personalInfoSchema = z.object({
