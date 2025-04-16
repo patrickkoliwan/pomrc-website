@@ -11,11 +11,10 @@ import { FormData } from "../page";
 import PersonalInfo from "./PersonalInfo";
 import EventDetails from "./EventDetails";
 import VenueSelection from "./VenueSelection";
-import VenueInfo from "./VenueInfo";
 import TermsAcceptance from "./TermsAcceptance";
 import TermsContent from "./TermsContent";
 import LoadingSpinner from "./LoadingSpinner";
-import { DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface VenueHireFormModalContentProps {
@@ -43,14 +42,8 @@ export default function VenueHireFormModalContent({
 }: VenueHireFormModalContentProps) {
   // State for inline terms view
   const [isViewingFullTerms, setIsViewingFullTerms] = useState(false);
-  // State to track if user clicked "Accept" in the inline view
-  const [hasAcceptedFullTerms, setHasAcceptedFullTerms] = useState(false);
-
-  // Watch the RHF termsAccepted checkbox value
-  const termsAcceptedValue = watch("termsAccepted");
 
   const handleAcceptFullTerms = () => {
-    setHasAcceptedFullTerms(true);
     setIsViewingFullTerms(false); // Go back to form view
   };
 
