@@ -4,15 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useEffect } from "react";
-import PersonalInfo, { personalInfoSchema } from "./components/PersonalInfo";
-import EventDetails, { eventDetailsSchema } from "./components/EventDetails";
+import { personalInfoSchema } from "./components/PersonalInfo";
+import { eventDetailsSchema } from "./components/EventDetails";
 import VenueInfo from "./components/VenueInfo";
 import TermsDisplay from "./components/TermsDisplay";
 import VenueHireSteps from "./components/VenueHireSteps";
 import AvailableVenues from "./components/AvailableVenues";
-import VenueSelection, {
-  venueSelectionSchema,
-} from "./components/VenueSelection";
+import { venueSelectionSchema } from "./components/VenueSelection";
 import { formStorage } from "./utils/formPersistence";
 import { api } from "./utils/api";
 import {
@@ -21,9 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
   DialogDescription,
-  DialogClose,
 } from "@/components/ui/dialog";
 import VenueHireFormModalContent from "./components/VenueHireFormModalContent";
 
