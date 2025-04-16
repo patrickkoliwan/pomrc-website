@@ -16,6 +16,7 @@ import TermsAcceptance from "./TermsAcceptance";
 import TermsContent from "./TermsContent";
 import LoadingSpinner from "./LoadingSpinner";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface VenueHireFormModalContentProps {
   register: UseFormRegister<FormData>;
@@ -94,85 +95,29 @@ export default function VenueHireFormModalContent({
 
   // Render the Form View
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 px-1 py-2">
-      <PersonalInfo
-        register={register}
-        errors={errors}
-        isLoading={isSubmitting}
-      />
-      <EventDetails
-        register={register}
-        errors={errors}
-        isLoading={isSubmitting}
-      />
-      <VenueSelection
-        register={register}
-        errors={errors}
-        isLoading={isSubmitting}
-      />
-      <div className="pt-4">
-        <VenueInfo isLoading={isSubmitting} />
-      </div>
-
-      {/* Area for Terms Acceptance */}
-      <div className="pt-4 border-t border-gray-200 space-y-3">
-        {/* Button to trigger inline view */}
-        <button
-          type="button"
-          onClick={() => setIsViewingFullTerms(true)}
-          className="text-deep-red hover:text-muted-teal transition-colors text-sm underline"
-        >
-          View & Accept Full Terms and Conditions
-        </button>
-
-        {/* RHF Terms Acceptance checkbox */}
-        <TermsAcceptance
-          register={register}
-          errors={errors}
-          isLoading={isSubmitting}
-        />
-        {/* Reminder to view/accept full terms if not yet done */}
-        {!hasAcceptedFullTerms && (
-          <p className="text-sm text-muted-teal -mt-2 ml-6">
-            You must view and accept the full terms using the link above before
-            submitting.
-          </p>
-        )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="grid grid-cols-1 gap-6">
+        <PersonalInfo register={register} errors={errors} />
+        <EventDetails register={register} errors={errors} watch={watch} />
+        <VenueSelection register={register} errors={errors} />
+        <TermsAcceptance register={register} errors={errors} />
       </div>
 
       {submitError && (
-        <div className="bg-deep-red/10 text-deep-red p-3 rounded-md text-sm">
-          <strong>Error:</strong> {submitError}
-        </div>
+        <p className="text-deep-red text-sm mt-4">Error: {submitError}</p>
       )}
 
-      <DialogFooter className="pt-4 sm:justify-between">
-        <DialogClose asChild>
-          <button
-            type="button"
-            onClick={onClose} // Ensure onClose prop is used for cancel
-            className="mt-2 sm:mt-0 bg-gray-200 text-gray-700 py-2 px-4 rounded-md font-medium hover:bg-gray-300 transition-colors"
-          >
-            Cancel
-          </button>
-        </DialogClose>
-        <button
+      <DialogFooter className="pt-6">
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
           type="submit"
-          // Disable if submitting OR full terms not accepted OR RHF checkbox not checked
-          disabled={
-            isSubmitting || !hasAcceptedFullTerms || !termsAcceptedValue
-          }
-          className="w-full sm:w-auto bg-dark-teal text-light-cream py-2 px-6 rounded-md font-medium hover:bg-muted-teal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title={
-            !hasAcceptedFullTerms
-              ? "Please view and accept the full terms and conditions first"
-              : !termsAcceptedValue
-              ? "Please check the box to confirm you agree to the terms"
-              : undefined
-          }
+          disabled={isSubmitting}
+          className="bg-deep-red hover:bg-deep-red/80 text-light-cream"
         >
-          {isSubmitting ? <LoadingSpinner size="sm" /> : "Submit Request"}
-        </button>
+          {isSubmitting ? <LoadingSpinner /> : "Submit Request"}
+        </Button>
       </DialogFooter>
     </form>
   );
