@@ -2,55 +2,17 @@
 
 ## Current Focus
 
-Setting up the Next.js API Routes backend infrastructure and planning database integration.
+- Task: Refactor Venue Hire page Modal - Inline Terms View
+- Objective: Implement inline view for full T&Cs within the form modal, requiring explicit acceptance.
+- Current Step: Simplify `TermsDisplay.tsx`.
 
 ## Recent Changes
 
-- Created project directory structure
-- Initialized Next.js frontend with:
-  - TypeScript
-  - Tailwind CSS
-  - ESLint
-  - App Router
-  - Src directory structure
-- Selected Next.js API Routes as backend solution for:
-  - Unified deployment
-  - Built-in TypeScript support
-  - Faster MVP development
-  - Future migration flexibility
+- Attempted layout adjustment for terms in modal (now obsolete).
+- Updated `tasks.md` with new plan for inline terms view (manual verification needed).
 
 ## Next Steps
 
-- Set up API directory structure and middleware
-- Choose and configure database
-- Plan authentication system
-- Implement initial API endpoints
-
-## Current Challenges
-
-- Database selection pending analysis
-- Authentication system design needed
-- API structure and organization planning needed
-
-## Implementation Notes
-
-### Frontend
-
-- Using Next.js 14 with App Router
-- TypeScript for type safety
-- Tailwind CSS for styling
-- ESLint for code quality
-- Custom import alias (@/\*) configured
-
-### Backend
-
-- Selected Next.js API Routes for backend
-- Benefits:
-  - Unified deployment pipeline
-  - Built-in TypeScript support
-  - Faster initial development
-  - Option to migrate to NestJS later if needed
-- Next steps:
-  - Set up API middleware
-  - Configure database
-  - Implement authentication
+- Remove nested modal from `TermsDisplay.tsx`.
+- Modify `TermsDisplay` button to trigger parent state change.
+- Implement state and conditional rendering in `VenueHireFormModalContent.tsx`.

@@ -1,0 +1,26 @@
+{
+  "name": "pomrc-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,tsx}": [
+      "next lint --fix"
+    ]
+  }
+}

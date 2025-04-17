@@ -1,0 +1,77 @@
+[
+  {
+    "error_type": "ESLint: Unused Variables/Imports & Unescaped Entities",
+    "error_messages": [
+      "react/no-unescaped-entities",
+      "@typescript-eslint/no-unused-vars"
+    ],
+    "files_affected": [
+      "frontend/src/app/venue-hire/components/TermsContent.tsx",
+      "frontend/src/app/venue-hire/page.tsx"
+    ],
+    "cause": "Unescaped double quotes (\") in JSX text. Unused imports (PersonalInfo, EventDetails, VenueSelection, DialogFooter, DialogClose) after refactoring.",
+    "fix": "Replaced \" with &quot;. Removed unused imports."
+  },
+  {
+    "error_type": "TypeScript: Incorrect Import Path",
+    "error_messages": [
+      "Module '../page' has no exported member 'MembershipFormData'"
+    ],
+    "files_affected": [
+      "frontend/src/app/membership/components/Declaration.tsx",
+      "frontend/src/app/membership/components/PersonalInfo.tsx",
+      "frontend/src/app/membership/components/MembershipStatus.tsx",
+      "frontend/src/app/membership/utils/api.ts",
+      "frontend/src/app/membership/utils/formPersistence.ts"
+    ],
+    "cause": "MembershipFormData type was defined in '../components/MembershipFormModal.tsx' but components/utils were trying to import it from '../page'.",
+    "fix": "Corrected import paths in all affected files to point to '../components/MembershipFormModal'."
+  },
+  {
+    "error_type": "ESLint: Unused Variables/Imports",
+    "error_messages": ["@typescript-eslint/no-unused-vars"],
+    "files_affected": [
+      "frontend/src/app/membership/components/MembershipStatus.tsx"
+    ],
+    "cause": "The 'FieldErrors' type was imported from 'react-hook-form' but was no longer used in the component.",
+    "fix": "Removed 'FieldErrors' from the react-hook-form import."
+  },
+  {
+    "error_type": "TypeScript: Incorrect Component Props",
+    "error_messages": [
+      "Property 'size' does not exist on type 'IntrinsicAttributes'"
+    ],
+    "files_affected": [
+      "frontend/src/app/venue-hire/components/VenueHireFormModalContent.tsx"
+    ],
+    "cause": "The LoadingSpinner component (in venue-hire/components) does not accept any props, but was being passed 'size=\"sm\"'.",
+    "fix": "Removed the 'size' prop from the <LoadingSpinner /> instance."
+  },
+  {
+    "error_type": "ESLint: Unused Variables/Imports",
+    "error_messages": ["@typescript-eslint/no-unused-vars"],
+    "files_affected": [
+      "frontend/src/app/venue-hire/components/VenueHireFormModalContent.tsx"
+    ],
+    "cause": "The 'watch' function from react-hook-form was destructured from component props but was no longer used after removing it from child component calls.",
+    "fix": "Removed 'watch' from the props destructuring."
+  },
+  {
+    "error_type": "TypeScript: Incorrect Component Props",
+    "error_messages": [
+      "Property 'watch' does not exist on type 'IntrinsicAttributes & VenueHireFormModalContentProps'"
+    ],
+    "files_affected": ["frontend/src/app/venue-hire/page.tsx"],
+    "cause": "The <VenueHireFormModalContent /> component instance was being passed the 'watch' prop, but the component definition no longer accepted it.",
+    "fix": "Removed the 'watch={watch}' prop from the <VenueHireFormModalContent /> usage."
+  },
+  {
+    "error_type": "TypeScript: Property Does Not Exist on Type",
+    "error_messages": [
+      "Property 'destructive' does not exist on type '{ default: string; outline: string; }'"
+    ],
+    "files_affected": ["frontend/src/components/ui/button.tsx"],
+    "cause": "The internal 'variantStyles' object used for styling did not define keys for all possible variants listed in the ButtonProps interface (e.g., destructive, secondary), causing a potential runtime error when accessing an undefined key.",
+    "fix": "Added entries for all defined variants (destructive, secondary, ghost, link) to the 'variantStyles' object with basic Tailwind classes."
+  }
+]
