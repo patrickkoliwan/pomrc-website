@@ -3,16 +3,16 @@
 import { useEffect } from "react";
 
 // Add type for LayoutShift
-type LayoutShift = PerformanceEntry & {
-  hadRecentInput: boolean;
-  value: number;
-};
+// type LayoutShift = PerformanceEntry & {
+//   hadRecentInput: boolean;
+//   value: number;
+// };
 
 // Add type for FirstInputEntry
-type FirstInputEntry = PerformanceEntry & {
-  processingStart: number;
-  startTime: number;
-};
+// type FirstInputEntry = PerformanceEntry & {
+//   processingStart: number;
+//   startTime: number;
+// };
 
 export default function PerformanceMetrics() {
   useEffect(() => {
@@ -24,39 +24,39 @@ export default function PerformanceMetrics() {
         (entry) => entry.name === "first-contentful-paint"
       );
       if (fcp) {
-        console.log("FCP:", fcp.startTime);
+        // console.log("FCP:", fcp.startTime);
       }
 
       // Largest Contentful Paint
-      const lcpObserver = new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        console.log("LCP:", lastEntry.startTime);
+      const lcpObserver = new PerformanceObserver(() => {
+        // const entries = entryList.getEntries();
+        // const lastEntry = entries[entries.length - 1];
+        // console.log("LCP:", lastEntry.startTime);
       });
       lcpObserver.observe({ entryTypes: ["largest-contentful-paint"] });
 
       // Cumulative Layout Shift
-      const clsObserver = new PerformanceObserver((entryList) => {
-        let clsValue = 0;
-        for (const entry of entryList.getEntries()) {
-          const layoutShift = entry as LayoutShift;
-          if (!layoutShift.hadRecentInput) {
-            clsValue += layoutShift.value;
-          }
-        }
-        console.log("CLS:", clsValue);
+      const clsObserver = new PerformanceObserver(() => {
+        // let clsValue = 0;
+        // for (const entry of entryList.getEntries()) {
+        //   const layoutShift = entry as LayoutShift;
+        //   if (!layoutShift.hadRecentInput) {
+        //     clsValue += layoutShift.value;
+        //   }
+        // }
+        // console.log("CLS:", clsValue);
       });
       clsObserver.observe({ entryTypes: ["layout-shift"] });
 
       // First Input Delay
-      const fidObserver = new PerformanceObserver((entryList) => {
-        for (const entry of entryList.getEntries()) {
-          const firstInput = entry as FirstInputEntry;
-          console.log(
-            "FID:",
-            firstInput.processingStart - firstInput.startTime
-          );
-        }
+      const fidObserver = new PerformanceObserver(() => {
+        // for (const entry of entryList.getEntries()) {
+        //   const firstInput = entry as FirstInputEntry;
+        //   // console.log(
+        //   //   "FID:",
+        //   //   firstInput.processingStart - firstInput.startTime
+        //   // );
+        // }
       });
       fidObserver.observe({ entryTypes: ["first-input"] });
     }

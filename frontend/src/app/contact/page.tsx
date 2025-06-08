@@ -73,7 +73,6 @@ export default function Contact() {
     try {
       // Check for honeypot
       if (data.honeypot) {
-        console.log("Spam detected");
         return;
       }
 
