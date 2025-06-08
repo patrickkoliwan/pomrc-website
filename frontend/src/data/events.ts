@@ -39,7 +39,7 @@ export const upcomingEvents: Event[] = [
     title: "State of Origin Game 2 Viewing Party 🏉",
     description:
       "Join us for an exciting night of rugby league! Wear your team colors and cheer on your favorites. Special feature: Fundraising BBQ by our Squashies team. Come support both your team and our club members!",
-    date: "18th June 2024",
+    date: "18th June 2025",
     time: "6:00 PM",
     location: "Clubhouse",
     isWeekly: false,
