@@ -1,4 +1,4 @@
-import { MembershipFormData } from "../components/MembershipFormModal";
+import type { MembershipFormData } from "../utils/types";
 
 const FORM_STORAGE_KEY = "membership-form-data";
 

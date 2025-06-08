@@ -12,87 +12,36 @@ export interface Event {
 export const weeklyEvents: Event[] = [
   {
     id: "1",
-    title: "Social Tennis Doubles Night 🎾",
+    title: "Thursday Night Raffle 🎟️",
     description:
-      "Experience the thrill of doubles tennis in a fun, social atmosphere! Whether you bring your partner or let us match you up, you'll enjoy competitive play and great company. Perfect for all skill levels - come make new friends and improve your game!",
-    date: "Tuesday & Thursday",
-    time: "6:00 PM - 8:00 PM",
-    location: "Main Tennis Courts",
-    isWeekly: true,
-    price: "K20 per person",
-  },
-  {
-    id: "2",
-    title: "Mojo Food Co. Speed Squash ⚡",
-    description:
-      "Get ready for fast-paced, heart-pumping action at our Speed Squash nights! Whether you're a beginner or pro, this high-energy session welcomes all players. Experience the excitement of rapid-fire matches and improve your skills in a supportive environment!",
+      "Try your luck at our June raffle! Every Thursday night, you have a fantastic chance to win a delicious meat tray. Support the club and potentially take home a great prize!",
     date: "Thursday",
-    time: "6:00 PM",
-    location: "Squash Courts",
-    isWeekly: true,
-    price: "K15 per person",
-  },
-  {
-    id: "3",
-    title: "POMRC Juniors Breakfast 🍳",
-    description:
-      "Start your weekend right with our amazing Junior Breakfast! Indulge in freshly brewed coffee, refreshing slushies, delicious baked goods, crispy waffles, and mouth-watering hotdogs and hamburgers. Best part? Your enjoyment helps support our junior tennis and squash programs!",
-    date: "Saturday",
-    time: "8am - Midday",
-    location: "Hauswin",
-    isWeekly: true,
-  },
-  {
-    id: "4",
-    title: "Live Music Nights 🎵",
-    description:
-      "End your week on a high note with Port Moresby's finest musicians! Our weekend live music sessions feature the city's most talented bands and performers, creating the perfect atmosphere for a memorable evening. Members enjoy free entry (gate fees may apply for non-members on special nights). Check socials to see who we have on next!",
-    date: "Friday & Saturday",
     time: "Evening",
-    location: "Clubhouse",
+    location: "Club Bar",
     isWeekly: true,
-  },
+    price: "K5 per ticket",
+  }
 ];
 
 export const upcomingEvents: Event[] = [
   {
-    id: "5",
-    title: "Junior Club Challenge Series 🏆",
+    id: "2",
+    title: "POMRC Open Tournament 🏆",
     description:
-      "Watch the future stars of tennis shine in our exciting Junior Club Challenge Series! Young talents will compete in this monthly tournament, showcasing their skills and determination. Come support our junior athletes as they battle for the championship!",
-    date: "April 25, 2024",
-    time: "TBA",
-    location: "Tennis Courts",
+      "Get ready for an exclusive and exciting tournament weekend! This is your chance to showcase your skills and compete against fellow members in friendly rivalry. Registration forms are available at the bar - don't miss out on this premier club event!",
+    date: "June 20-22, 2024",
+    time: "8:00 AM - 6:00 PM",
+    location: "POMRC Courts",
     isWeekly: false,
   },
   {
-    id: "6",
-    title: "Club Squash Competition 🎯",
+    id: "3",
+    title: "State of Origin Game 2 Viewing Party 🏉",
     description:
-      "Don't miss this thrilling squash tournament featuring open mixed and U18 mixed categories! Experience intense matches, spectacular rallies, and fierce competition as players vie for the top spots. Perfect for participants and spectators alike!",
-    date: "April 5, 2024",
-    time: "3:00 PM",
-    location: "Squash Courts",
+      "Join us for an exciting night of rugby league! Wear your team colors and cheer on your favorites. Special feature: Fundraising BBQ by our Squashies team. Come support both your team and our club members!",
+    date: "June 2024",
+    time: "6:00 PM",
+    location: "Clubhouse",
     isWeekly: false,
-  },
-  {
-    id: "7",
-    title: "Squash Fundraiser Disco 💃",
-    description:
-      "Get your dancing shoes ready for an unforgettable night! Join us for a fantastic disco fundraiser supporting our junior squash players as they prepare for the QLD Junior Championships. Great music, amazing atmosphere, and a worthy cause - what's not to love? Gate fee applies.",
-    date: "May 2, 2024",
-    time: "Evening",
-    location: "Club Arena",
-    isWeekly: false,
-  },
-  {
-    id: "8",
-    title: "Squash Movie Night Fundraiser 🎬",
-    description:
-      "Join us for a special movie night at the squash arena! Bring your family and friends for an evening of entertainment while supporting our junior squash champions. All proceeds go towards the QLD Junior Championships. Everyone's welcome!",
-    date: "May 10, 2024",
-    time: "Evening",
-    location: "Squash Arena",
-    isWeekly: false,
-  },
+  }
 ];

@@ -10,9 +10,7 @@ export default function Events() {
             Club Events
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Join us for exciting weekly activities and special events at Port
-            Moresby Racquet Club. From social sports to live entertainment,
-            there&apos;s something for everyone!
+            Get ready for an action-packed JUNE with a mix of fundraising, competitive play, and an exciting exclusive annual event of the club. From raffle nights to tournament weekends and special viewing parties, there&apos;s something for everyone to enjoy and support!
           </p>
         </div>
 

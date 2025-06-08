@@ -1,6 +1,6 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import LoadingSpinner from "./LoadingSpinner";
-import { MembershipFormData } from "./MembershipFormModal";
+import type { MembershipFormData } from "../utils/types";
 
 interface DeclarationProps {
   register: UseFormRegister<MembershipFormData>;
