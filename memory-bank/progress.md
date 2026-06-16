@@ -2,36 +2,33 @@
 
 ## Current Status
 
-- Starting task: Refactor Venue Hire page to use Modal v1.0.
-- Current Phase: Documentation Setup.
+- Current phase: Maintenance and security hardening.
+- Recent work consolidated Next config, hardened form email generation, improved form API rate limiting, cleaned unused starter assets, and added a root build smoke test.
+- Current task: frontend dependency security update and documentation refresh completed.
 
 ## What Works
 
-- Basic project structure is set up.
-- Previous tasks (About page enhancements, Junior Program data merging) are completed.
-- Venue Hire page exists but needs refactoring.
+- Next.js App Router site builds successfully.
+- Contact, membership, and venue-hire forms submit through Next.js API routes.
+- Form emails use environment-based Gmail credentials and escaped HTML content.
+- API routes use shared per-route, per-IP in-memory rate limiting.
+- Root `npm test` runs the frontend production build.
 
 ## What's Left
 
-- Complete the Venue Hire page refactor according to the new requirements (modal form).
+- Update stale event content once current replacement event details are available.
+- Venue-hire full-terms modal flow has partial implementation and should remain backlog until explicitly prioritized.
 
 ## Blockers
 
-- None currently identified.
+- Current event replacements are a content/product decision.
 
 ## Completed Tasks
 
-- See `tasks.md` for a detailed list of completed tasks and links to archives.
+- See `tasks.md` for completed and backlog items.
 
 ## Reflections / Learnings
 
-- (To be added after task completion)
-- **About Page Enhancement Task:**
-  - Reusable components (`HeroSection`, `AnimatedSection`) improved organization.
-  - `framer-motion` `whileInView` with `once: true` is effective for scroll animations.
-  - Using parent `space-y-*` is often better than child `mb-*` for consistent spacing between wrapped sections.
-  - Future improvements: Staggered gallery animations, custom focus rings, linked CTA.
-
-## Future Milestones
-
-// ... existing code ...
+- Reusable shared helpers are useful for form hardening across contact, membership, and venue-hire flows.
+- Keep package and memory-bank docs synchronized after dependency maintenance to avoid stale stack assumptions.
+- Targeted npm overrides can address nested advisories without forcing unsafe framework downgrades when the build still verifies.

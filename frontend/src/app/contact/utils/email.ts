@@ -1,4 +1,8 @@
-import nodemailer from 'nodemailer';
+import {
+  createEmailTransporter,
+  escapeHtml,
+  getEmailConfig,
+} from '@/app/utils/email';
 
 interface ContactFormData {
   name: string;
@@ -6,20 +10,11 @@ interface ContactFormData {
   enquiry: string;
 }
 
-// Create reusable transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'pngtennis.raffle2025@gmail.com',
-    pass: process.env.EMAIL_PASSWORD // App-specific password from Gmail
-  }
-});
-
 function createTableRow(label: string, value: string | undefined) {
   return `
     <tr>
-      <td style="padding: 10px; border: 1px solid #ddd; width: 30%; background-color: #f9f9f9;">${label}</td>
-      <td style="padding: 10px; border: 1px solid #ddd;">${value || ''}</td>
+      <td style="padding: 10px; border: 1px solid #ddd; width: 30%; background-color: #f9f9f9;">${escapeHtml(label)}</td>
+      <td style="padding: 10px; border: 1px solid #ddd;">${escapeHtml(value)}</td>
     </tr>
   `;
 }
@@ -28,7 +23,7 @@ function createSectionHeader(title: string) {
   return `
     <tr>
       <th colspan="2" style="padding: 15px; text-align: left; background-color: #1f5e5b; color: white; border: 1px solid #ddd;">
-        ${title}
+        ${escapeHtml(title)}
       </th>
     </tr>
   `;
@@ -50,10 +45,12 @@ export async function sendContactEmail(data: ContactFormData) {
   `;
 
   // Send the email
+  const emailConfig = getEmailConfig();
+  const transporter = createEmailTransporter(emailConfig);
   const mailOptions = {
-    from: 'pngtennis.raffle2025@gmail.com',
-    to: 'pngtennis.raffle2025@gmail.com',
-    subject: `ENQUIRY - ${data.name}`,
+    from: emailConfig.user,
+    to: emailConfig.to,
+    subject: `ENQUIRY - ${escapeHtml(data.name)}`,
     html: htmlContent,
   };
 

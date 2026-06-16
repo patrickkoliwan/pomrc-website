@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
+import { isValidPhoneOrEmail } from "@/app/utils/contactValidation";
 
 interface GoogleMapProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   className?: string;
@@ -176,11 +177,9 @@ export default function Contact() {
                   id="contact"
                   {...register("contact", {
                     required: "Phone or Email is required",
-                    pattern: {
-                      value: /^(\+?[\d\s-]+|\w+@\w+\.\w{2,3})$/,
-                      message:
-                        "Please enter a valid phone number or email address",
-                    },
+                    validate: (value) =>
+                      isValidPhoneOrEmail(value) ||
+                      "Please enter a valid phone number or email address",
                     maxLength: {
                       value: 100,
                       message: "Contact information is too long",

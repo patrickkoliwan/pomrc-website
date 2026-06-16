@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { sendVenueHireEmail } from '@/app/venue-hire/utils/email';
+import { checkRateLimit, getClientIp } from '@/app/utils/rateLimit';
+
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_REQUESTS = 10; // Maximum requests per window
 
 // Validation schemas
 const personalInfoSchema = z.object({
@@ -32,30 +36,22 @@ const formSchema = z.object({
   }),
 });
 
-// Define a type for the global object to avoid using 'any'
-declare global {
-  // eslint-disable-next-line no-var
-  var requestCount: number;
-  // eslint-disable-next-line no-var
-  var lastRequestTime: number;
-}
-
 export async function POST(request: Request) {
   try {
-    // Basic rate limiting
-    const now = Date.now();
-    const requestCount = global.requestCount || 0;
-    const lastRequestTime = global.lastRequestTime || 0;
+    const ip = getClientIp(request);
 
-    if (now - lastRequestTime < 1000 || requestCount > 10) {
+    if (
+      !checkRateLimit({
+        key: `venue-hire:${ip}`,
+        limit: MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW,
+      })
+    ) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
         { status: 429 }
       );
     }
-
-    global.requestCount = requestCount + 1;
-    global.lastRequestTime = now;
 
     const data = await request.json();
     

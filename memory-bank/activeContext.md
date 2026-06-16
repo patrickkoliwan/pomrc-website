@@ -2,17 +2,21 @@
 
 ## Current Focus
 
-- Task: Refactor Venue Hire page Modal - Inline Terms View
-- Objective: Implement inline view for full T&Cs within the form modal, requiring explicit acceptance.
-- Current Step: Simplify `TermsDisplay.tsx`.
+- Task: Maintenance backlog.
+- Objective: Keep the website secure, buildable, and aligned with current club content.
+- Current Step: Await next prioritized issue.
 
 ## Recent Changes
 
-- Attempted layout adjustment for terms in modal (now obsolete).
-- Updated `tasks.md` with new plan for inline terms view (manual verification needed).
+- Consolidated Next.js config into `frontend/next.config.ts`.
+- Hardened form emails with escaped HTML and environment-based email configuration.
+- Replaced API route global counters with shared per-route rate limiting.
+- Removed unused starter assets.
+- Added root `npm test` as a frontend build smoke test.
+- Upgraded frontend dependencies for security maintenance.
+- Confirmed `npm audit` reports zero vulnerabilities and `npm test` passes.
 
 ## Next Steps
 
-- Remove nested modal from `TermsDisplay.tsx`.
-- Modify `TermsDisplay` button to trigger parent state change.
-- Implement state and conditional rendering in `VenueHireFormModalContent.tsx`.
+- Keep stale 2025 event content as a separate content update task.
+- Decide whether venue-hire full-terms acceptance flow should be completed or simplified.
