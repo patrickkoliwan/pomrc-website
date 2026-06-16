@@ -13,7 +13,7 @@ const MembershipPerks: React.FC = () => {
 
       <div className="border-t border-gray-200 pt-6">
         <h3 className="text-2xl font-semibold text-dark-teal mb-4">
-          2025 Court Fees & Members Access Policy
+          Court Fees & Members Access Policy
         </h3>
 
         <div className="mb-6">

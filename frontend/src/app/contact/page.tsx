@@ -276,7 +276,7 @@ export default function Contact() {
               <h3 className="text-lg font-medium text-dark-teal mb-2">
                 Visit Us
               </h3>
-              <p className="text-muted-teal">Port Moresby Raquets Club</p>
+              <p className="text-muted-teal">Port Moresby Racquets Club</p>
               <p className="text-muted-teal">Bava Street, Boroko</p>
               <p className="text-muted-teal">Port Moresby, Papua New Guinea</p>
             </div>

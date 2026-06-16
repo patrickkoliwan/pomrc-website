@@ -16,8 +16,8 @@
 
 ## What's Left
 
-- Update stale event content once current replacement event details are available.
-- Venue-hire full-terms modal flow has partial implementation and should remain backlog until explicitly prioritized.
+- Add current upcoming event content once replacement dates and copy are available.
+- Keep memory-bank docs aligned with any future architecture or form-flow changes.
 
 ## Blockers
 

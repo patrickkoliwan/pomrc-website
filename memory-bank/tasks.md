@@ -11,17 +11,17 @@
 
 ## Backlog
 
-- [ ] Venue-hire full terms acceptance flow
+- [x] Venue-hire full terms flow
   - [x] Verify/Install Modal Component (e.g., shadcn/ui Dialog)
   - [x] Refactor `TermsAndConditions` into `TermsDisplay` and `TermsAcceptance`
   - [x] Modify `page.tsx`: Add modal state, rearrange static content, add CTA, render Modal
   - [x] Create `VenueHireFormModalContent.tsx` component with form sections, static info, and controls
   - [x] Pass form state/handlers from `page.tsx` to `VenueHireFormModalContent.tsx`
   - [x] Update `onSubmit` in `page.tsx` to close modal on success
-  - [ ] Simplify `TermsDisplay.tsx` if full terms should live only inside the form modal
-  - [ ] Add explicit `hasAcceptedFullTerms` state if policy requires full-terms acceptance beyond the checkbox
-  - [ ] Test terms viewing/acceptance flow and overall form functionality
-- [ ] Replace stale 2025 event content when current event details are available
+  - [x] Keep public `TermsDisplay` as a read-only full-terms preview
+  - [x] Add explicit `hasAcceptedFullTerms` state for form submission
+  - [x] Verify build after terms viewing/acceptance flow changes
+- [x] Hide stale 2025 upcoming event content until current event details are available
 
 ## Completed Tasks
 

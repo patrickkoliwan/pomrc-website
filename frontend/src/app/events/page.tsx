@@ -10,12 +10,17 @@ export default function Events() {
             Club Events
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Get ready for an action-packed JUNE with a mix of fundraising, competitive play, and an exciting exclusive annual event of the club. From raffle nights to tournament weekends and special viewing parties, there&apos;s something for everyone to enjoy and support!
+            Stay up to date with regular club activities, fundraising nights,
+            tournaments, and special community events at POMRC.
           </p>
         </div>
 
         <EventSection title="Weekly Events" events={weeklyEvents} />
-        <EventSection title="Upcoming Events" events={upcomingEvents} />
+        <EventSection
+          title="Upcoming Events"
+          events={upcomingEvents}
+          emptyMessage="No upcoming events are scheduled right now. Check back soon for updates."
+        />
       </div>
     </main>
   );

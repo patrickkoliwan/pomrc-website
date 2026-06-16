@@ -155,6 +155,7 @@ export default function VenueHire() {
                 register={register}
                 errors={errors}
                 handleSubmit={handleSubmit}
+                watch={watch}
                 onSubmit={onSubmit}
                 isSubmitting={isSubmitting}
                 isLoading={!isClient}

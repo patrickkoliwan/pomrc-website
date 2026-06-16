@@ -18,5 +18,5 @@
 
 ## Next Steps
 
-- Keep stale 2025 event content as a separate content update task.
-- Decide whether venue-hire full-terms acceptance flow should be completed or simplified.
+- Add current upcoming event details when the club has confirmed dates and copy.
+- Commit the current form correctness and content cleanup pass.

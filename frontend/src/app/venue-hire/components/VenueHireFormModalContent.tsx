@@ -5,6 +5,7 @@ import {
   UseFormRegister,
   FieldErrors,
   UseFormHandleSubmit,
+  UseFormWatch,
 } from "react-hook-form";
 import { FormData } from "../page";
 import PersonalInfo from "./PersonalInfo";
@@ -20,6 +21,7 @@ interface VenueHireFormModalContentProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   handleSubmit: UseFormHandleSubmit<FormData>;
+  watch: UseFormWatch<FormData>;
   onSubmit: (data: FormData) => Promise<void>;
   isSubmitting: boolean;
   isLoading: boolean;
@@ -31,6 +33,7 @@ export default function VenueHireFormModalContent({
   register,
   errors,
   handleSubmit,
+  watch,
   onSubmit,
   isSubmitting,
   isLoading,
@@ -39,8 +42,12 @@ export default function VenueHireFormModalContent({
 }: VenueHireFormModalContentProps) {
   // State for inline terms view
   const [isViewingFullTerms, setIsViewingFullTerms] = useState(false);
+  const [hasAcceptedFullTerms, setHasAcceptedFullTerms] = useState(false);
+  const termsAccepted = watch("termsAccepted");
+  const canSubmit = termsAccepted && hasAcceptedFullTerms && !isSubmitting;
 
   const handleAcceptFullTerms = () => {
+    setHasAcceptedFullTerms(true);
     setIsViewingFullTerms(false); // Go back to form view
   };
 
@@ -90,7 +97,12 @@ export default function VenueHireFormModalContent({
         <PersonalInfo register={register} errors={errors} />
         <EventDetails register={register} errors={errors} />
         <VenueSelection register={register} errors={errors} />
-        <TermsAcceptance register={register} errors={errors} />
+        <TermsAcceptance
+          register={register}
+          errors={errors}
+          hasAcceptedFullTerms={hasAcceptedFullTerms}
+          onReadFullTerms={() => setIsViewingFullTerms(true)}
+        />
       </div>
 
       {submitError && (
@@ -103,7 +115,7 @@ export default function VenueHireFormModalContent({
         </Button>
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={!canSubmit}
           className="bg-deep-red hover:bg-deep-red/80 text-light-cream"
         >
           {isSubmitting ? <LoadingSpinner /> : "Submit Request"}

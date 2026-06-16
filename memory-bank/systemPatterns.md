@@ -2,42 +2,43 @@
 
 ## Architecture Overview
 
-- **Frontend:** Next.js (TypeScript, Tailwind CSS, App Router)
-- **Backend:** Next.js API Routes (Initial)
-- **Communication:** Direct fetch within Next.js
-- **Database:** TBD
+- **Application:** Next.js App Router project in `frontend/`
+- **Frontend:** React, TypeScript, Tailwind CSS
+- **Backend:** Integrated Next.js API routes
+- **Communication:** Client components submit forms with `fetch` to local API routes
+- **Persistence:** No database; forms are emailed to configured recipients
 
 ## Frontend Patterns
 
-- **Component Model:** Mix of Server Components (default) and Client Components (`"use client"`) for interactivity.
-- **State Management:** Primarily React Hooks (`useState`, `useEffect`, `useContext`). Consider Zustand or Jotai for complex global state if needed later.
-- **Styling:** Utility-first with Tailwind CSS. Custom colors defined in `tailwind.config.js`.
-- **Routing:** Next.js App Router for file-based routing.
-- **Data Fetching:** Server Components for server-side fetching, `fetch` API or SWR/React Query in Client Components.
+- Server Components are the default for static pages.
+- Client Components use `"use client"` for interactive forms, modals, carousels, and local state.
+- Form-heavy features are organized by route with local `components/` and `utils/` folders.
+- Shared cross-feature helpers live under `frontend/src/app/utils`.
+- Styling uses Tailwind utility classes and project colors from Tailwind config.
 
-## Backend Patterns (API Routes)
+## Backend Patterns
 
-- **Structure:** Organized by feature within `src/app/api/`.
-- **Request Handling:** Standard Next.js `Request` and `Response` objects.
-- **Error Handling:** Centralized error handling middleware (TBD).
-- **Validation:** TBD (e.g., Zod).
+- API routes live under `frontend/src/app/api`.
+- Each form route validates request data with Zod before sending email.
+- Form email utilities build HTML emails with escaped submitted values.
+- Email configuration comes from `EMAIL_USER`, `EMAIL_PASSWORD`, and `EMAIL_TO`.
+- Rate limiting is in-memory and scoped by route plus client IP.
 
 ## Directory Structure
 
-```
+```text
 pomrc-website/
-├── frontend/         # Next.js application
+├── frontend/
 │   ├── public/
 │   ├── src/
-│   │   ├── app/        # App Router pages and API routes
-│   │   ├── components/ # Reusable UI components
-│   │   ├── lib/        # Utility functions, constants
-│   │   └── styles/     # Global styles
-│   ├── next.config.js
-│   ├── tailwind.config.js
+│   │   ├── app/        # App Router pages, API routes, feature utilities
+│   │   ├── components/ # Shared UI and content components
+│   │   ├── data/       # Static site content
+│   │   └── lib/        # Generic helpers
+│   ├── next.config.ts
+│   ├── tailwind.config.ts
 │   ├── tsconfig.json
 │   └── package.json
-├── backend/          # Currently integrated via Next.js API Routes
 ├── docs/
 │   └── archive/
 └── memory-bank/
@@ -45,9 +46,7 @@ pomrc-website/
 
 ## Coding Conventions
 
-- Follow Next.js and React best practices.
 - Use TypeScript strict mode.
-- Adhere to ESLint rules.
-- Prefer functional components with hooks.
-- Keep components small and focused.
-- Use descriptive naming for variables, functions, and components.
+- Prefer shared schemas/helpers when client and API behavior must match.
+- Keep public content in local data/components unless a CMS is introduced later.
+- Run `npm test` from the repo root before committing.
