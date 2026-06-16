@@ -1,6 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import {
+  addressLine1,
+  addressLine2,
+  clubDescription,
+  clubName,
+  openingDays,
+  openingHours,
+  openingHoursNote,
+  publicEmail,
+} from "@/lib/site";
 
 const quickLinks = [
   { href: "/membership", label: "Membership" },
@@ -16,12 +26,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Club Information */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">
-              Port Moresby Racquets Club
-            </h3>
+            <h3 className="text-xl font-semibold mb-4">{clubName}</h3>
             <p className="text-muted-teal">
-              Your premier destination for tennis, squash, and social activities
-              in Port Moresby, offering both recreational and competitive
+              {clubDescription}, offering both recreational and competitive
               opportunities.
             </p>
           </div>
@@ -47,9 +54,9 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-semibold mb-4">Opening Hours</h3>
             <div className="space-y-2 text-muted-teal">
-              <p>Monday - Sunday</p>
-              <p>6:00 AM - 11:00 PM</p>
-              <p className="text-sm italic">Public holidays to be advised</p>
+              <p>{openingDays}</p>
+              <p>{openingHours}</p>
+              <p className="text-sm italic">{openingHoursNote}</p>
             </div>
           </div>
 
@@ -57,9 +64,9 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
             <div className="space-y-2 text-muted-teal">
-              <p>Bava Street, East Boroko</p>
-              <p>Port Moresby, Papua New Guinea</p>
-              <p>Email: info@portmoresbyracquetsclub.com</p>
+              <p>{addressLine1}</p>
+              <p>{addressLine2}</p>
+              <p>Email: {publicEmail}</p>
             </div>
           </div>
         </div>
@@ -67,7 +74,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-muted-teal text-center text-muted-teal">
           <p>
-            &copy; {new Date().getFullYear()} Port Moresby Racquets Club. All
+            &copy; {new Date().getFullYear()} {clubName}. All
             rights reserved.
           </p>
         </div>

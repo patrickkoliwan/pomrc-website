@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = "https://pomrc.com";
+import { siteUrl } from "@/lib/site";
 
 const routes = [
   "",

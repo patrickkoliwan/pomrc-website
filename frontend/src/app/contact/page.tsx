@@ -4,6 +4,12 @@ import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import { isValidPhoneOrEmail } from "@/app/utils/contactValidation";
+import {
+  addressLine1,
+  addressLine2,
+  clubName,
+  googleMapsEmbedUrl,
+} from "@/lib/site";
 
 interface GoogleMapProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
   className?: string;
@@ -264,7 +270,7 @@ export default function Contact() {
           {/* Google Maps */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <GoogleMap
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.3743960284323!2d147.20059828293876!3d-9.4761270751332!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x690236b85f5f7729%3A0xd6ae37f22b23fbb5!2sPort%20Moresby%20Raquets%20Club%20Bava%20St%2C%20Boroko!5e0!3m2!1sen!2spg!4v1743198276873!5m2!1sen!2spg"
+              src={googleMapsEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -276,9 +282,9 @@ export default function Contact() {
               <h3 className="text-lg font-medium text-dark-teal mb-2">
                 Visit Us
               </h3>
-              <p className="text-muted-teal">Port Moresby Racquets Club</p>
-              <p className="text-muted-teal">Bava Street, Boroko</p>
-              <p className="text-muted-teal">Port Moresby, Papua New Guinea</p>
+              <p className="text-muted-teal">{clubName}</p>
+              <p className="text-muted-teal">{addressLine1}</p>
+              <p className="text-muted-teal">{addressLine2}</p>
             </div>
           </div>
         </div>

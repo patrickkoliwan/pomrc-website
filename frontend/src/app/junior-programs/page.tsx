@@ -1,5 +1,6 @@
 import ProgramCard from "@/components/ProgramCard";
 import { juniorPrograms } from "@/data/juniorPrograms";
+import { facebookUrl } from "@/lib/site";
 
 export default function JuniorPrograms() {
   const tennisPrograms = juniorPrograms.filter((program) =>
@@ -66,7 +67,7 @@ export default function JuniorPrograms() {
                 <div className="flex items-center gap-2">
                   <p>Check socials for latest updates</p>
                   <a 
-                    href="https://www.facebook.com/pomracquetsclub"
+                    href={facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800"

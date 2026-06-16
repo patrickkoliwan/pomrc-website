@@ -6,6 +6,7 @@ import { MdOutlineSportsTennis } from "react-icons/md";
 import { LuPartyPopper } from "react-icons/lu";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useState, useEffect } from "react";
+import { googleMapsEmbedUrl, googleMapsPlaceUrl } from "@/lib/site";
 
 // Hero carousel image data
 const heroImages = [
@@ -194,7 +195,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="w-full h-[500px]">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3935.3743960284355!2d147.20059828123692!3d-9.476127075131304!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x690236b85f5f7729%3A0xd6ae37f22b23fbb5!2sPort%20Moresby%20Raquets%20Club%20Bava%20St%2C%20Boroko!5e0!3m2!1sen!2spg!4v1743199274557!5m2!1sen!2spg"
+                src={googleMapsEmbedUrl}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -263,7 +264,7 @@ export default function Home() {
                   </p>
                 </div>
                 <a
-                  href="https://www.google.com/maps/place/Port+Moresby+Raquets+Club+Bava+St,+Boroko/@-9.4761271,147.2005983,17z/data=!3m1!4b1!4m6!3m5!1s0x690236b85f5f7729:0xd6ae37f22b23fbb5!8m2!3d-9.4761271!4d147.2005983!16s%2Fg%2F11c5m8c4k8"
+                  href={googleMapsPlaceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center px-4 py-2 text-deep-red hover:text-muted-teal transition-colors mt-4 group"
