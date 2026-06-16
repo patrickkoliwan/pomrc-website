@@ -5,6 +5,17 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+const navLinks = [
+  { href: "/about", label: "About" },
+  { href: "/facilities", label: "Facilities" },
+  { href: "/events", label: "Events" },
+  { href: "/junior-programs", label: "Junior Programs" },
+  { href: "/membership", label: "Membership" },
+  { href: "/venue-hire", label: "Venue Hire" },
+  { href: "/club-committee", label: "Committee" },
+  { href: "/contact", label: "Contact" },
+];
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -39,54 +50,15 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-8">
-          <Link
-            href="/about"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            About
-          </Link>
-          <Link
-            href="/facilities"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Facilities
-          </Link>
-          <Link
-            href="/events"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Events
-          </Link>
-          <Link
-            href="/junior-programs"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Junior Programs
-          </Link>
-          <Link
-            href="/membership"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Membership
-          </Link>
-          <Link
-            href="/venue-hire"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Venue Hire
-          </Link>
-          <Link
-            href="/club-committee"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Committee
-          </Link>
-          <Link
-            href="/contact"
-            className="text-light-cream hover:text-muted-teal transition-colors text-lg"
-          >
-            Contact
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-light-cream hover:text-muted-teal transition-colors text-lg"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
         {/* Mobile Menu Button */}
@@ -134,54 +106,15 @@ const Navbar = () => {
           </div>
         </button>
         <div className="flex flex-col items-center justify-center h-full space-y-8">
-          <Link
-            href="/about"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            About
-          </Link>
-          <Link
-            href="/facilities"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Facilities
-          </Link>
-          <Link
-            href="/events"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Events
-          </Link>
-          <Link
-            href="/junior-programs"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Junior Programs
-          </Link>
-          <Link
-            href="/membership"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Membership
-          </Link>
-          <Link
-            href="/venue-hire"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Venue Hire
-          </Link>
-          <Link
-            href="/club-committee"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Committee
-          </Link>
-          <Link
-            href="/contact"
-            className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
-          >
-            Contact
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-light-cream hover:text-muted-teal transition-colors text-2xl font-medium"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       </div>
     </nav>

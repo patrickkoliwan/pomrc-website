@@ -3,11 +3,11 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PerformanceMetrics from "@/components/PerformanceMetrics";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://pomrc.com"),
   title: "Port Moresby Racquets Club",
   description:
     "Your premier destination for tennis, squash, and social activities in Port Moresby",
@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     "social activities",
   ],
   authors: [{ name: "Port Moresby Racquets Club" }],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Port Moresby Racquets Club",
     description:
@@ -28,12 +31,21 @@ export const metadata: Metadata = {
     siteName: "Port Moresby Racquets Club",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "Port Moresby Racquets Club logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Port Moresby Racquets Club",
     description:
       "Your premier destination for tennis, squash, and social activities in Port Moresby",
+    images: ["/logo.png"],
   },
   robots: {
     index: true,
@@ -56,7 +68,6 @@ export default function RootLayout({
       <body
         className={`${inter.className} bg-light-cream min-h-screen flex flex-col`}
       >
-        <PerformanceMetrics />
         <Navbar />
         <div className="flex-grow">{children}</div>
         <Footer />

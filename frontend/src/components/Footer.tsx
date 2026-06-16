@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 
+const quickLinks = [
+  { href: "/membership", label: "Membership" },
+  { href: "/facilities", label: "Facilities" },
+  { href: "/events", label: "Events" },
+  { href: "/contact", label: "Contact" },
+];
+
 const Footer = () => {
   return (
     <footer className="bg-dark-teal text-light-cream py-8">
@@ -23,38 +30,16 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/membership"
-                  className="text-muted-teal hover:text-light-cream transition-colors"
-                >
-                  Membership
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/facilities"
-                  className="text-muted-teal hover:text-light-cream transition-colors"
-                >
-                  Facilities
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/events"
-                  className="text-muted-teal hover:text-light-cream transition-colors"
-                >
-                  Events
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-muted-teal hover:text-light-cream transition-colors"
-                >
-                  Contact
-                </Link>
-              </li>
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-teal hover:text-light-cream transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
