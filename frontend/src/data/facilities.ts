@@ -1,8 +1,13 @@
+import type { FacilityCategory } from "@/app/facilities/facilities-content";
+
 export interface Facility {
   id: string;
   title: string;
   description: string;
   imageUrl: string;
+  features?: string[];
+  category?: FacilityCategory;
+  displayOrder?: number;
 }
 
 export const facilities: Facility[] = [

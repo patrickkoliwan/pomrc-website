@@ -3,6 +3,10 @@ import { z } from 'zod';
 import { sendMembershipEmail } from '@/app/membership/utils/email';
 import { membershipFormSchema } from '@/app/membership/utils/schema';
 import { checkRateLimit, getClientIp } from '@/app/utils/rateLimit';
+import {
+  createMembershipApplication,
+  updateMembershipApplicationEmailStatus,
+} from '@/lib/membership/applications';
 
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_REQUESTS = 10; // Maximum requests per window
@@ -29,10 +33,33 @@ export async function POST(request: Request) {
     // Validate the data
     const validatedData = membershipFormSchema.parse(data);
 
-    // Send email
-    await sendMembershipEmail(validatedData);
+    const application = await createMembershipApplication(validatedData);
 
-    return NextResponse.json({ success: true });
+    try {
+      await sendMembershipEmail(validatedData);
+      try {
+        await updateMembershipApplicationEmailStatus(application.id, {
+          email_status: 'sent',
+        });
+      } catch (statusError) {
+        console.error('Membership email status update error:', statusError);
+      }
+    } catch (emailError) {
+      console.error('Membership email notification error:', emailError);
+      try {
+        await updateMembershipApplicationEmailStatus(application.id, {
+          email_status: 'failed',
+          email_error:
+            emailError instanceof Error
+              ? emailError.message
+              : 'Failed to send membership email',
+        });
+      } catch (statusError) {
+        console.error('Membership email status update error:', statusError);
+      }
+    }
+
+    return NextResponse.json({ success: true, applicationId: application.id });
   } catch (error) {
     console.error('Membership form submission error:', error);
     if (error instanceof z.ZodError) {

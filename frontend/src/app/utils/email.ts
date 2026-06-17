@@ -3,6 +3,10 @@ import nodemailer from "nodemailer";
 interface EmailConfig {
   user: string;
   password: string;
+  host: string;
+  port: number;
+  from: string;
+  defaultTo: string;
   to: string;
 }
 
@@ -17,14 +21,17 @@ export function escapeHtml(value: string | number | boolean | undefined) {
 }
 
 export function getEmailConfig(): EmailConfig {
-  const user = process.env.EMAIL_USER;
-  const password = process.env.EMAIL_PASSWORD;
-  const to = process.env.EMAIL_TO;
+  const user = process.env.ZOHO_SMTP_USER || process.env.EMAIL_USER;
+  const password = process.env.ZOHO_SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
+  const host = process.env.ZOHO_SMTP_HOST || "smtp.zoho.com";
+  const port = Number(process.env.ZOHO_SMTP_PORT || 465);
+  const from = process.env.ZOHO_DEFAULT_FROM || user;
+  const defaultTo = process.env.ZOHO_DEFAULT_TO || process.env.EMAIL_TO;
 
   const missingKeys = [
-    ["EMAIL_USER", user],
-    ["EMAIL_PASSWORD", password],
-    ["EMAIL_TO", to],
+    ["ZOHO_SMTP_USER", user],
+    ["ZOHO_SMTP_PASSWORD", password],
+    ["ZOHO_DEFAULT_TO", defaultTo],
   ]
     .filter(([, value]) => !value)
     .map(([key]) => key);
@@ -35,20 +42,26 @@ export function getEmailConfig(): EmailConfig {
     );
   }
 
-  if (!user || !password || !to) {
+  if (!user || !password || !host || !port || !from || !defaultTo) {
     throw new Error("Email configuration is incomplete");
   }
 
   return {
     user,
     password,
-    to,
+    host,
+    port,
+    from,
+    defaultTo,
+    to: defaultTo,
   };
 }
 
 export function createEmailTransporter(config: EmailConfig) {
   return nodemailer.createTransport({
-    service: "gmail",
+    host: config.host,
+    port: config.port,
+    secure: config.port === 465,
     auth: {
       user: config.user,
       pass: config.password,

@@ -7,8 +7,14 @@ import {
 interface ContactFormData {
   name: string;
   contact: string;
+  enquiryType: string;
   enquiry: string;
 }
+
+type ContactRecipient = {
+  to: string;
+  cc?: string[];
+};
 
 function createTableRow(label: string, value: string | undefined) {
   return `
@@ -29,7 +35,10 @@ function createSectionHeader(title: string) {
   `;
 }
 
-export async function sendContactEmail(data: ContactFormData) {
+export async function sendContactEmail(
+  data: ContactFormData,
+  recipient?: ContactRecipient
+) {
   // Start building the HTML email content
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
@@ -39,6 +48,7 @@ export async function sendContactEmail(data: ContactFormData) {
         ${createTableRow('Contact (Phone/Email)', data.contact)}
 
         ${createSectionHeader('Enquiry Details')}
+        ${createTableRow('Enquiry Type', data.enquiryType)}
         ${createTableRow('Message', data.enquiry)}
       </table>
     </div>
@@ -48,9 +58,10 @@ export async function sendContactEmail(data: ContactFormData) {
   const emailConfig = getEmailConfig();
   const transporter = createEmailTransporter(emailConfig);
   const mailOptions = {
-    from: emailConfig.user,
-    to: emailConfig.to,
-    subject: `ENQUIRY - ${escapeHtml(data.name)}`,
+    from: emailConfig.from,
+    to: recipient?.to || emailConfig.defaultTo,
+    cc: recipient?.cc,
+    subject: `ENQUIRY - ${escapeHtml(data.enquiryType)} - ${escapeHtml(data.name)}`,
     html: htmlContent,
   };
 

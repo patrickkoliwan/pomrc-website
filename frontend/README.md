@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Admin CMS
+
+The production CMS uses Firebase Auth, Supabase Postgres/Storage, and Zoho SMTP. See `docs/admin-cms-setup.md` for the setup steps, schema, first-admin process, and seed command.
+
 ## Getting Started
 
 First, run the development server:

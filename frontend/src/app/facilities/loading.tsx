@@ -1,22 +1,26 @@
 export default function FacilitiesLoading() {
   return (
     <main className="min-h-screen bg-light-cream">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="h-12 w-64 bg-gray-200 rounded-lg animate-pulse mb-8" />
+      <div className="bg-light-teal px-4 py-10 text-center sm:px-6 md:py-14 lg:px-8">
+        <div className="mx-auto max-w-3xl space-y-3">
+          <div className="mx-auto h-10 w-64 animate-pulse rounded bg-light-teal/50" />
+          <div className="mx-auto h-5 w-96 max-w-full animate-pulse rounded bg-light-teal/50" />
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[...Array(6)].map((_, i) => (
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8">
+          {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="bg-gray-100 rounded-xl shadow-lg overflow-hidden"
+              className="overflow-hidden rounded-xl bg-white ring-1 ring-dark-teal/10"
             >
-              <div className="relative w-full h-56 bg-gray-200 animate-pulse" />
-              <div className="p-6">
-                <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
+              <div className="aspect-[16/10] animate-pulse bg-light-teal/50" />
+              <div className="space-y-3 p-5">
+                <div className="h-5 w-2/3 animate-pulse rounded bg-light-teal/50" />
                 <div className="space-y-2">
-                  <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 w-4/6 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-4 w-full animate-pulse rounded bg-light-teal/50" />
+                  <div className="h-4 w-5/6 animate-pulse rounded bg-light-teal/50" />
                 </div>
               </div>
             </div>

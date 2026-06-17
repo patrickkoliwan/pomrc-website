@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { memo } from "react";
+import { getPublishedCommitteeMembers } from "@/lib/cms/public-data";
 
 interface CommitteeMember {
   name: string;
@@ -20,8 +18,7 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-// Memoize the committee member card component
-const CommitteeMemberCard = memo(function CommitteeMemberCard({
+function CommitteeMemberCard({
   member,
   index,
 }: {
@@ -73,7 +70,7 @@ const CommitteeMemberCard = memo(function CommitteeMemberCard({
       </div>
     </div>
   );
-});
+}
 
 const committeeMembers: CommitteeMember[] = [
   {
@@ -138,7 +135,18 @@ const committeeMembers: CommitteeMember[] = [
   },
 ];
 
-export default function CommitteePage() {
+export const revalidate = 3600;
+
+export default async function CommitteePage() {
+  const cmsMembers = await getPublishedCommitteeMembers();
+  const displayedMembers = cmsMembers.length
+    ? cmsMembers.map((member) => ({
+        name: member.name,
+        position: member.title,
+        imageUrl: member.photo_url || "",
+      }))
+    : committeeMembers;
+
   return (
     <main className="min-h-screen bg-light-cream py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -158,7 +166,7 @@ export default function CommitteePage() {
           role="list"
           aria-label="Committee Members"
         >
-          {committeeMembers.map((member, index) => (
+          {displayedMembers.map((member, index) => (
             <CommitteeMemberCard
               key={member.name}
               member={member}

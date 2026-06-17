@@ -1,49 +1,56 @@
-import FacilityCard from "../components/FacilityCard";
-import MobileContentsMenu from "../components/MobileContentsMenu";
-import { facilities, Facility } from "@/data/facilities";
+import Link from "next/link";
+import { facilities, type Facility } from "@/data/facilities";
+import { getPublishedFacilities } from "@/lib/cms/public-data";
+import FacilitiesContent from "./FacilitiesContent";
+import FacilitiesHero from "./FacilitiesHero";
 
-// Enable static generation
-export const metadata = {
-  generateStaticParams: true,
-};
+export const revalidate = 86400;
 
-// Mark page as static
-export const dynamic = "force-static";
+function mapFallbackFacilities(): Facility[] {
+  return facilities.map((facility, index) => ({
+    ...facility,
+    displayOrder: index,
+  }));
+}
 
-// Add revalidation period (e.g., rebuild page every 24 hours)
-export const revalidate = 86400; // 24 hours
-
-export default function Facilities() {
-  // Pre-calculate prioritized facilities for better performance
-  const isPrioritized = (id: string) =>
-    id === "southern-courts" || id === "northern-courts";
+export default async function Facilities() {
+  const cmsFacilities = await getPublishedFacilities();
+  const displayedFacilities: Facility[] = cmsFacilities.length
+    ? cmsFacilities.map((facility) => {
+        const slug = facility.slug || facility.id;
+        return {
+          id: slug,
+          title: facility.name,
+          description: facility.description || "",
+          imageUrl: facility.image_url || "/clubhouse.jpg",
+          displayOrder: facility.display_order,
+        };
+      })
+    : mapFallbackFacilities();
 
   return (
     <main className="min-h-screen bg-light-cream">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-dark-teal mb-8">
-          Our Facilities
-        </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {facilities.map((facility: Facility) => (
-            <div key={facility.id} id={facility.id}>
-              <FacilityCard
-                title={facility.title}
-                description={facility.description}
-                imageUrl={facility.imageUrl}
-                priority={isPrioritized(facility.id)}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+      <FacilitiesHero />
+      <FacilitiesContent facilities={displayedFacilities} />
 
-      <MobileContentsMenu
-        items={facilities.map((f: Facility) => ({
-          title: f.title,
-          id: f.id,
-        }))}
-      />
+      <footer className="border-t border-dark-teal/10 py-8 text-center">
+        <p className="text-sm text-dark-teal/80 md:text-base">
+          Interested in hosting an event or becoming a member?{" "}
+          <Link
+            href="/venue-hire"
+            className="font-medium text-deep-red hover:text-muted-teal"
+          >
+            Hire a venue
+          </Link>
+          {" · "}
+          <Link
+            href="/membership"
+            className="font-medium text-deep-red hover:text-muted-teal"
+          >
+            View membership
+          </Link>
+        </p>
+      </footer>
     </main>
   );
 }

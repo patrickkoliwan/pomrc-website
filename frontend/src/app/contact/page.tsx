@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import { isValidPhoneOrEmail } from "@/app/utils/contactValidation";
@@ -34,9 +34,22 @@ const GoogleMap = dynamic(
 type FormData = {
   name: string;
   contact: string;
+  enquiryType: string;
   enquiry: string;
   honeypot: string; // Spam prevention
 };
+
+type EnquiryOption = {
+  value: string;
+  label: string;
+};
+
+const fallbackEnquiryOptions: EnquiryOption[] = [
+  { value: "general", label: "General enquiry" },
+  { value: "membership", label: "Membership" },
+  { value: "venue-hire", label: "Venue hire" },
+  { value: "junior-programs", label: "Junior programs" },
+];
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,6 +58,7 @@ export default function Contact() {
   );
   const [submitCount, setSubmitCount] = useState(0);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [enquiryOptions, setEnquiryOptions] = useState(fallbackEnquiryOptions);
 
   const {
     register,
@@ -52,6 +66,19 @@ export default function Contact() {
     reset,
     formState: { errors },
   } = useForm<FormData>();
+
+  useEffect(() => {
+    fetch("/api/contact-routing")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((result) => {
+        if (result?.data?.length) {
+          setEnquiryOptions(result.data);
+        }
+      })
+      .catch(() => {
+        setEnquiryOptions(fallbackEnquiryOptions);
+      });
+  }, []);
 
   // Rate limiting function
   const checkRateLimit = useCallback(() => {
@@ -96,6 +123,7 @@ export default function Contact() {
       const sanitizedData = {
         name: data.name.trim(),
         contact: data.contact.trim(),
+        enquiryType: data.enquiryType,
         enquiry: data.enquiry.trim(),
       };
 
@@ -203,6 +231,34 @@ export default function Contact() {
                     role="alert"
                   >
                     {errors.contact.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="enquiryType"
+                  className="block text-dark-teal font-medium mb-2"
+                >
+                  Enquiry Type <span className="text-deep-red">*</span>
+                </label>
+                <select
+                  id="enquiryType"
+                  defaultValue="general"
+                  {...register("enquiryType", {
+                    required: "Enquiry type is required",
+                  })}
+                  className="w-full px-4 py-2 border border-muted-teal rounded-md focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                >
+                  {enquiryOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.enquiryType && (
+                  <p className="mt-1 text-deep-red text-sm" role="alert">
+                    {errors.enquiryType.message}
                   </p>
                 )}
               </div>
