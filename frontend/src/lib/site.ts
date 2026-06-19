@@ -3,7 +3,20 @@ export const clubName = "Port Moresby Racquets Club";
 export const clubShortName = "POMRC";
 export const clubDescription =
   "Your premier destination for tennis, squash, and social activities in Port Moresby";
-export const publicEmail = "info@portmoresbyracquetsclub.com";
+export const publicEmail = "admin@pomracquetsclub.com";
+
+export const contactPhones = [
+  {
+    label: "POMRC Office",
+    display: "7665 7980",
+    tel: "+67576657980",
+  },
+  {
+    label: "POMRC Bar",
+    display: "7824 3869",
+    tel: "+67578243869",
+  },
+] as const;
 export const addressLine1 = "Bava Street, Boroko";
 export const addressLine2 = "Port Moresby, Papua New Guinea";
 export const openingDays = "Monday - Sunday";

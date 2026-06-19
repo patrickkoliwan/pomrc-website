@@ -40,6 +40,39 @@ create table if not exists public.club_events (
   updated_at timestamptz default now()
 );
 
+create table if not exists public.junior_programs (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  program_type text not null default 'other',
+  description text not null,
+  day_text text not null,
+  time_text text not null,
+  location text not null,
+  price text not null,
+  image_url text,
+  display_order integer default 0,
+  published boolean default true,
+  updated_at timestamptz default now(),
+  constraint junior_programs_program_type_check check (
+    program_type in ('tennis', 'squash', 'other')
+  )
+);
+
+create table if not exists public.junior_program_notice (
+  id text primary key default 'primary',
+  message text not null default '',
+  section text not null default 'tennis',
+  enabled boolean default true,
+  updated_at timestamptz default now(),
+  constraint junior_program_notice_singleton_check check (id = 'primary'),
+  constraint junior_program_notice_section_check check (
+    section in ('page', 'tennis', 'squash', 'other')
+  ),
+  constraint junior_program_notice_enabled_message_check check (
+    enabled = false or length(btrim(message)) > 0
+  )
+);
+
 create table if not exists public.committee_members (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -49,6 +82,16 @@ create table if not exists public.committee_members (
   email_alias text,
   display_order integer default 0,
   published boolean default true,
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.committee_positions (
+  id uuid primary key default gen_random_uuid(),
+  title text unique not null,
+  display_order integer default 0,
+  published boolean default true,
+  member_id uuid references public.committee_members(id) on delete set null,
+  is_acting boolean default false,
   updated_at timestamptz default now()
 );
 
@@ -114,9 +157,24 @@ create trigger set_club_events_updated_at
 before update on public.club_events
 for each row execute function public.set_updated_at();
 
+drop trigger if exists set_junior_programs_updated_at on public.junior_programs;
+create trigger set_junior_programs_updated_at
+before update on public.junior_programs
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_junior_program_notice_updated_at on public.junior_program_notice;
+create trigger set_junior_program_notice_updated_at
+before update on public.junior_program_notice
+for each row execute function public.set_updated_at();
+
 drop trigger if exists set_committee_members_updated_at on public.committee_members;
 create trigger set_committee_members_updated_at
 before update on public.committee_members
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_committee_positions_updated_at on public.committee_positions;
+create trigger set_committee_positions_updated_at
+before update on public.committee_positions
 for each row execute function public.set_updated_at();
 
 drop trigger if exists set_contact_routing_updated_at on public.contact_routing;
@@ -132,7 +190,10 @@ for each row execute function public.set_updated_at();
 alter table public.site_pages enable row level security;
 alter table public.facilities enable row level security;
 alter table public.club_events enable row level security;
+alter table public.junior_programs enable row level security;
+alter table public.junior_program_notice enable row level security;
 alter table public.committee_members enable row level security;
+alter table public.committee_positions enable row level security;
 alter table public.contact_routing enable row level security;
 alter table public.membership_applications enable row level security;
 
@@ -154,11 +215,49 @@ on public.club_events for select
 to anon, authenticated
 using (published = true);
 
+drop policy if exists "Public can read published junior programs" on public.junior_programs;
+create policy "Public can read published junior programs"
+on public.junior_programs for select
+to anon, authenticated
+using (published = true);
+
+drop policy if exists "Public can read enabled junior program notice" on public.junior_program_notice;
+create policy "Public can read enabled junior program notice"
+on public.junior_program_notice for select
+to anon, authenticated
+using (enabled = true);
+
 drop policy if exists "Public can read published committee members" on public.committee_members;
 create policy "Public can read published committee members"
 on public.committee_members for select
 to anon, authenticated
 using (published = true);
+
+drop policy if exists "Public can read published committee positions" on public.committee_positions;
+create policy "Public can read published committee positions"
+on public.committee_positions for select
+to anon, authenticated
+using (published = true and member_id is not null);
+
+insert into public.committee_positions (
+  title,
+  display_order,
+  published,
+  member_id,
+  is_acting
+)
+select distinct on (title)
+  title,
+  display_order,
+  published,
+  id,
+  false
+from public.committee_members
+order by title, display_order, updated_at desc
+on conflict (title) do update set
+  display_order = excluded.display_order,
+  published = excluded.published,
+  member_id = coalesce(public.committee_positions.member_id, excluded.member_id);
 
 -- No insert/update/delete policies are created for anon or authenticated users.
 -- No public select policy is created for contact_routing because it stores

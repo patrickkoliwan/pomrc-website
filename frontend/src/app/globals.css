@@ -69,13 +69,22 @@ body {
   }
 }
 
-
-
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .event-card-poster {
+    height: 9rem;
+    width: 100%;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  @media (min-width: 768px) {
+    .event-card-poster {
+      height: 11rem !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .event-card-poster {
+      height: 13rem !important;
+    }
   }
 }
+

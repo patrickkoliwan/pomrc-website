@@ -1,15 +1,36 @@
 import ProgramCard from "@/components/ProgramCard";
 import { juniorPrograms } from "@/data/juniorPrograms";
-import { facebookUrl } from "@/lib/site";
+import {
+  getPublishedJuniorProgramNotice,
+  getPublishedJuniorPrograms,
+} from "@/lib/cms/public-data";
+import type {
+  JuniorProgramNoticeRecord,
+  JuniorProgramNoticeSection,
+} from "@/lib/cms/types";
+import {
+  groupJuniorPrograms,
+  mapJuniorProgram,
+} from "@/lib/junior-programs/programs";
+import { hasSupabasePublicConfig } from "@/lib/supabase/server";
 
-export default function JuniorPrograms() {
-  const tennisPrograms = juniorPrograms.filter((program) =>
-    program.title.toLowerCase().includes("tennis")
-  );
-
-  const squashPrograms = juniorPrograms.filter((program) =>
-    program.title.toLowerCase().includes("squash")
-  );
+export default async function JuniorPrograms() {
+  const [cmsPrograms, notice] = await Promise.all([
+    getPublishedJuniorPrograms(),
+    getPublishedJuniorProgramNotice(),
+  ]);
+  const programs = hasSupabasePublicConfig()
+    ? cmsPrograms.map(mapJuniorProgram)
+    : juniorPrograms;
+  const groupedPrograms = groupJuniorPrograms(programs);
+  const tennisPrograms = groupedPrograms.tennis;
+  const squashPrograms = groupedPrograms.squash;
+  const otherPrograms = groupedPrograms.other;
+  const visibleSections = [
+    tennisPrograms.length > 0 && { href: "#tennis", label: "Tennis Programs" },
+    squashPrograms.length > 0 && { href: "#squash", label: "Squash Programs" },
+    otherPrograms.length > 0 && { href: "#other", label: "Other Programs" },
+  ].filter(Boolean) as { href: string; label: string }[];
 
   return (
     <main className="min-h-screen bg-light-cream">
@@ -25,104 +46,116 @@ export default function JuniorPrograms() {
           </p>
         </div>
 
-        {/* Program Navigation */}
-        <div className="flex justify-center mb-12">
-          <div className="inline-flex rounded-md shadow-sm bg-light-teal p-1">
-            <a
-              href="#tennis"
-              className="px-5 py-3 text-deep-red hover:text-dark-teal font-medium rounded-md hover:bg-white transition duration-150 ease-in-out"
-            >
-              Tennis Programs
-            </a>
-            <a
-              href="#squash"
-              className="px-5 py-3 text-deep-red hover:text-dark-teal font-medium rounded-md hover:bg-white transition duration-150 ease-in-out"
-            >
-              Squash Programs
-            </a>
+        {visibleSections.length > 0 && (
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex rounded-md shadow-sm bg-light-teal p-1">
+              {visibleSections.map((section) => (
+                <a
+                  key={section.href}
+                  href={section.href}
+                  className="px-5 py-3 text-deep-red hover:text-dark-teal font-medium rounded-md hover:bg-white transition duration-150 ease-in-out"
+                >
+                  {section.label}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Tennis Section */}
-        <section id="tennis" className="mb-16 scroll-mt-24">
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
-              Tennis Programs
-            </h2>
-            <div className="prose max-w-none">
-              <p className="text-lg text-gray-700 mb-6">
-                Our junior tennis training prepares children from age ten
-                onwards for competitive play at the highest level. We focus on
-                building strong foundations for the West Pacific Qualifiers
-                (WPQ), which begin at the under-12 category. Success at the WPQ
-                opens doors to the Pacific Oceania Junior Championships, where
-                top finishers may qualify for further opportunities in Pacific
-                Oceania junior touring events. Join us to start your
-                child&apos;s journey toward tennis excellence on the
-                international stage.
-              </p>
-              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-                <p className="font-bold mb-2">⚠️ Important Notice:</p>
-                <p className="mb-2">Due to unforeseen circumstances, group junior tennis programs have been suspended until further notice. Private coaching for kids is still available and parents can inquire at the club bar for available coaches, fees and time slots.</p>
-                <div className="flex items-center gap-2">
-                  <p>Check socials for latest updates</p>
-                  <a 
-                    href={facebookUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                  </a>
-                </div>
+        <JuniorProgramNotice notice={notice} placement="page" />
+
+        {tennisPrograms.length > 0 && (
+          <section id="tennis" className="mb-16 scroll-mt-24">
+            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
+                Tennis Programs
+              </h2>
+              <div className="prose max-w-none">
+                <p className="text-lg text-gray-700 mb-6">
+                  Our junior tennis training prepares children from age ten
+                  onwards for competitive play at the highest level. We focus on
+                  building strong foundations for the West Pacific Qualifiers
+                  (WPQ), which begin at the under-12 category. Success at the
+                  WPQ opens doors to the Pacific Oceania Junior Championships,
+                  where top finishers may qualify for further opportunities in
+                  Pacific Oceania junior touring events. Join us to start your
+                  child&apos;s journey toward tennis excellence on the
+                  international stage.
+                </p>
+                <JuniorProgramNotice notice={notice} placement="tennis" />
               </div>
             </div>
-          </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {tennisPrograms.map((program, index) => (
-              <ProgramCard
-                key={program.id}
-                program={program}
-                isPriority={index === 0}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Squash Section */}
-        <section id="squash" className="scroll-mt-24">
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
-              Squash Programs
-            </h2>
-            <div className="prose max-w-none">
-              <p className="text-lg text-gray-700 mb-6">
-                The Squash Junior Development Elite program offers weekly
-                dedicated training sessions for juniors aspiring to compete at
-                regional and international levels. Our program creates clear
-                pathways to prestigious competitions including the Oceania
-                Junior Championships and Australian Junior Open. POMRC Squash
-                Juniors have proudly represented PNG at the 2018 Commonwealth
-                Games, 2019 Pacific Games, and 2022 Birmingham Commonwealth
-                Games. Endorsed by the PNG Squash Rackets Federation, our
-                program is your child&apos;s gateway to sporting excellence.
-              </p>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {tennisPrograms.map((program, index) => (
+                <ProgramCard
+                  key={program.id}
+                  program={program}
+                  isPriority={index === 0}
+                />
+              ))}
             </div>
-          </div>
+          </section>
+        )}
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {squashPrograms.map((program, index) => (
-              <ProgramCard
-                key={program.id}
-                program={program}
-                isPriority={index === 0}
-              />
-            ))}
-          </div>
-        </section>
+        {squashPrograms.length > 0 && (
+          <section id="squash" className="mb-16 scroll-mt-24">
+            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
+                Squash Programs
+              </h2>
+              <div className="prose max-w-none">
+                <p className="text-lg text-gray-700 mb-6">
+                  The Squash Junior Development Elite program offers weekly
+                  dedicated training sessions for juniors aspiring to compete at
+                  regional and international levels. Our program creates clear
+                  pathways to prestigious competitions including the Oceania
+                  Junior Championships and Australian Junior Open. POMRC Squash
+                  Juniors have proudly represented PNG at the 2018 Commonwealth
+                  Games, 2019 Pacific Games, and 2022 Birmingham Commonwealth
+                  Games. Endorsed by the PNG Squash Rackets Federation, our
+                  program is your child&apos;s gateway to sporting excellence.
+                </p>
+                <JuniorProgramNotice notice={notice} placement="squash" />
+              </div>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {squashPrograms.map((program, index) => (
+                <ProgramCard
+                  key={program.id}
+                  program={program}
+                  isPriority={tennisPrograms.length === 0 && index === 0}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {otherPrograms.length > 0 && (
+          <section id="other" className="scroll-mt-24">
+            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
+                Other Programs
+              </h2>
+              <JuniorProgramNotice notice={notice} placement="other" />
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {otherPrograms.map((program, index) => (
+                <ProgramCard
+                  key={program.id}
+                  program={program}
+                  isPriority={
+                    tennisPrograms.length === 0 &&
+                    squashPrograms.length === 0 &&
+                    index === 0
+                  }
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Back to top button */}
         <div className="flex justify-center mt-12">
@@ -135,5 +168,28 @@ export default function JuniorPrograms() {
         </div>
       </div>
     </main>
+  );
+}
+
+function JuniorProgramNotice({
+  notice,
+  placement,
+}: {
+  notice: JuniorProgramNoticeRecord | null;
+  placement: JuniorProgramNoticeSection;
+}) {
+  if (!notice?.enabled || notice.section !== placement || !notice.message.trim()) {
+    return null;
+  }
+
+  const marginClass = placement === "page" ? "mb-12" : "mb-6";
+
+  return (
+    <div
+      className={`bg-red-100 border-l-4 border-red-500 text-red-700 p-4 ${marginClass}`}
+    >
+      <p className="font-bold mb-2">Important Notice:</p>
+      <p className="whitespace-pre-line">{notice.message}</p>
+    </div>
   );
 }

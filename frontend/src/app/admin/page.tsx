@@ -14,6 +14,11 @@ const cards = [
     description: "Publish regular activities, dated events, and event times.",
   },
   {
+    href: "/admin/junior-programs",
+    title: "Junior Programs",
+    description: "Manage junior tennis, squash, and other program cards.",
+  },
+  {
     href: "/admin/committee",
     title: "Committee Members",
     description: "Update committee profiles, photos, and email aliases.",

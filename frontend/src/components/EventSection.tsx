@@ -1,41 +1,60 @@
 import EventCard from "./EventCard";
+import type { Event } from "@/data/events";
 
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  isWeekly: boolean;
-  price?: string;
-}
+type EventSectionLayout = "list" | "poster" | "compact";
+type EventSectionSize = "default" | "subtle";
 
 interface EventSectionProps {
   title: string;
   events: Event[];
-  emptyMessage?: string;
+  layout?: EventSectionLayout;
+  size?: EventSectionSize;
+  isLast?: boolean;
 }
+
+const layoutGridClasses: Record<"poster" | "compact", string> = {
+  poster: "grid gap-8 sm:grid-cols-2",
+  compact: "grid gap-6 md:grid-cols-2 lg:grid-cols-3",
+};
 
 export default function EventSection({
   title,
   events,
-  emptyMessage = "No events are scheduled right now. Check back soon for updates.",
+  layout = "compact",
+  size = "default",
+  isLast = false,
 }: EventSectionProps) {
+  if (events.length === 0) {
+    return null;
+  }
+
+  const headingClasses =
+    size === "subtle"
+      ? "text-xl font-semibold text-dark-teal"
+      : "text-2xl font-bold text-dark-teal";
+
   return (
-    <section className="mb-16">
-      <div className="border-b-4 border-dark-teal mb-8">
-        <h2 className="text-3xl font-bold text-dark-teal pb-2">{title}</h2>
+    <section className={isLast ? "mb-0" : "mb-10"}>
+      <div className="mb-6 border-b border-dark-teal/20 pb-3">
+        {size === "default" && (
+          <p className="mb-1 text-sm font-medium uppercase tracking-wide text-deep-red">
+            Events
+          </p>
+        )}
+        <h2 className={headingClasses}>{title}</h2>
       </div>
-      {events.length > 0 ? (
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+
+      {layout === "list" ? (
+        <div className="divide-y divide-dark-teal/10 overflow-hidden rounded-xl bg-white ring-1 ring-dark-teal/10">
           {events.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard key={event.id} event={event} variant="list" />
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-muted-teal/30 bg-white p-6 text-dark-teal shadow-sm">
-          {emptyMessage}
+        <div className={layoutGridClasses[layout]}>
+          {events.map((event) => (
+            <EventCard key={event.id} event={event} variant="card" />
+          ))}
         </div>
       )}
     </section>

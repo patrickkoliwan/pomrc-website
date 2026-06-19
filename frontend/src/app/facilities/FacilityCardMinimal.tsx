@@ -26,7 +26,7 @@ export default function FacilityCardMinimal({
           priority={priority}
           loading={priority ? "eager" : "lazy"}
           className="object-cover"
-          sizes="(max-width: 640px) 100vw, 50vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
         />

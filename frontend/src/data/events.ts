@@ -3,10 +3,12 @@ export interface Event {
   title: string;
   description: string;
   date: string;
+  eventDate?: string;
   time: string;
   location: string;
   isWeekly: boolean;
   price?: string;
+  imageUrl?: string;
 }
 
 export const weeklyEvents: Event[] = [

@@ -5,20 +5,7 @@ interface AvailableVenuesProps {
   isLoading?: boolean;
 }
 
-const venues = [
-  {
-    id: "events-lawn",
-    title: "Events Lawn",
-    description: "Outdoor venue for up to 200 guests",
-    imageUrl: "/events-lawn.jpg",
-  },
-  {
-    id: "squash-courtyard",
-    title: "Squash Courtyard",
-    description: "Intimate courtyard for up to 50 guests",
-    imageUrl: "/squash-courtyard.jpg",
-  },
-];
+import { hireVenues } from "@/data/hireVenues";
 
 export default function AvailableVenues({
   isLoading = false,
@@ -32,7 +19,7 @@ export default function AvailableVenues({
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {venues.map((venue) => (
+        {hireVenues.map((venue) => (
           <div key={venue.id} className="relative group">
             <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
               <Image

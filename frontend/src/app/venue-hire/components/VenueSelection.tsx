@@ -19,32 +19,7 @@ interface VenueSelectionProps {
   isLoading?: boolean;
 }
 
-const venues = [
-  {
-    id: "events-lawn",
-    title: "Events Lawn",
-    description: "Perfect for large gatherings up to 200 guests",
-    imageUrl: "/events-lawn.jpg",
-    features: [
-      "Spacious outdoor setting",
-      "Perfect for large events",
-      "BBQ facilities available",
-      "Capacity: up to 200 guests",
-    ],
-  },
-  {
-    id: "squash-courtyard",
-    title: "Squash Courtyard",
-    description: "Intimate setting for gatherings up to 50 guests",
-    imageUrl: "/squash-courtyard.jpg",
-    features: [
-      "Cozy courtyard setting",
-      "Perfect for intimate events",
-      "Adjacent to squash courts",
-      "Capacity: up to 50 guests",
-    ],
-  },
-];
+import { hireVenues } from "@/data/hireVenues";
 
 export default function VenueSelection({
   register,
@@ -60,7 +35,7 @@ export default function VenueSelection({
       </h2>
 
       <div className="space-y-4">
-        {venues.map((venue) => (
+        {hireVenues.map((venue) => (
           <label key={venue.id} className="relative block cursor-pointer group">
             <input
               type="radio"
@@ -88,7 +63,7 @@ export default function VenueSelection({
                   <p className="text-muted-teal mb-4">{venue.description}</p>
 
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {venue.features.map((feature, index) => (
+                    {(venue.features ?? []).map((feature, index) => (
                       <li
                         key={index}
                         className="flex items-center text-sm text-dark-teal"

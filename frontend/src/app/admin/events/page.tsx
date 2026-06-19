@@ -14,6 +14,7 @@ export default async function AdminEventsPage() {
         table="club_events"
         records={records}
         titleField="title"
+        enableArchive
         newRecord={{
           title: "",
           description: "",
@@ -34,7 +35,7 @@ export default async function AdminEventsPage() {
           { name: "end_time", label: "End time", type: "text" },
           { name: "image_url", label: "Image", type: "image" },
           { name: "display_order", label: "Display order", type: "number" },
-          { name: "published", label: "Published", type: "checkbox" },
+          { name: "published", label: "Visible on events page", type: "checkbox" },
         ]}
       />
     </AdminShell>

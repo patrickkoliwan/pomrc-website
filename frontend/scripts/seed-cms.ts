@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { facilities } from "../src/data/facilities";
 import { weeklyEvents, upcomingEvents } from "../src/data/events";
+import { juniorPrograms } from "../src/data/juniorPrograms";
 
 const committeeMembers = [
   { name: "Robin Fleming", title: "Club President", photo_url: "/images/committee/robin-fleming.jpg" },
@@ -18,6 +19,9 @@ const committeeMembers = [
   { name: "Anna Togolo", title: "Squash Director", photo_url: "/images/committee/anna-togolo.jpg" },
   { name: "Barbara Stubbings", title: "Ex Officio", photo_url: "/images/committee/barbara-stubbings.jpg" },
 ];
+
+const juniorProgramNotice =
+  "Due to unforeseen circumstances, group junior tennis programs have been suspended until further notice. Private coaching for kids is still available and parents can inquire at the club bar for available coaches, fees and time slots.";
 
 function loadEnvFile(path: string) {
   if (!existsSync(path)) {
@@ -116,13 +120,104 @@ async function upsertData() {
     )
   );
 
+  for (const [index, program] of juniorPrograms.entries()) {
+    const { data: existingProgram, error: existingProgramError } =
+      await supabase
+        .from("junior_programs")
+        .select("id")
+        .eq("title", program.title)
+        .maybeSingle();
+
+    if (existingProgramError) {
+      throw existingProgramError;
+    }
+
+    const programPayload = {
+      title: program.title,
+      program_type: program.type,
+      description: program.description,
+      day_text: program.date,
+      time_text: program.time,
+      location: program.location,
+      price: program.price,
+      image_url: program.imageUrl,
+      display_order: index,
+      published: true,
+    };
+
+    await must(
+      existingProgram
+        ? supabase
+            .from("junior_programs")
+            .update(programPayload)
+            .eq("id", existingProgram.id)
+        : supabase.from("junior_programs").insert(programPayload)
+    );
+  }
+
   await must(
-    supabase.from("committee_members").upsert(
+    supabase.from("junior_program_notice").upsert(
+      {
+        id: "primary",
+        message: juniorProgramNotice,
+        section: "tennis",
+        enabled: true,
+      },
+      { onConflict: "id" }
+    )
+  );
+
+  for (const [index, member] of committeeMembers.entries()) {
+    const { data: existingMember, error: existingMemberError } = await supabase
+      .from("committee_members")
+      .select("id")
+      .eq("name", member.name)
+      .maybeSingle();
+
+    if (existingMemberError) {
+      throw existingMemberError;
+    }
+
+    const memberPayload = {
+      name: member.name,
+      title: "Committee Member",
+      photo_url: member.photo_url,
+      display_order: index,
+      published: true,
+    };
+
+    await must(
+      existingMember
+        ? supabase
+            .from("committee_members")
+            .update(memberPayload)
+            .eq("id", existingMember.id)
+        : supabase.from("committee_members").insert(memberPayload)
+    );
+  }
+
+  const { data: seededMembers, error: seededMembersError } = await supabase
+    .from("committee_members")
+    .select("id,name");
+
+  if (seededMembersError) {
+    throw seededMembersError;
+  }
+
+  const memberIdsByName = new Map(
+    (seededMembers || []).map((member) => [member.name, member.id])
+  );
+
+  await must(
+    supabase.from("committee_positions").upsert(
       committeeMembers.map((member, index) => ({
-        ...member,
+        title: member.title,
+        member_id: memberIdsByName.get(member.name) || null,
         display_order: index,
         published: true,
-      }))
+        is_acting: false,
+      })),
+      { onConflict: "title" }
     )
   );
 

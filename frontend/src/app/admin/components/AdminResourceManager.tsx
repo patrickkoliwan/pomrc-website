@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { CmsTable, SitePageBodySection } from "@/lib/cms/types";
+import CroppedImageUploader from "./CroppedImageUploader";
 
 type FieldType =
   | "text"
@@ -10,6 +11,7 @@ type FieldType =
   | "checkbox"
   | "image"
   | "date"
+  | "select"
   | "tags"
   | "sections";
 
@@ -19,6 +21,11 @@ type Field = {
   type: FieldType;
   required?: boolean;
   helpText?: string;
+  imageProcessing?: {
+    aspect?: number;
+    targetWidth?: number;
+  };
+  options?: { label: string; value: string }[];
 };
 
 type RecordShape = Record<string, unknown> & { id?: string };
@@ -30,6 +37,7 @@ export default function AdminResourceManager({
   titleField,
   newRecord,
   disableDelete = false,
+  enableArchive = false,
 }: {
   table: CmsTable;
   records: RecordShape[];
@@ -37,6 +45,7 @@ export default function AdminResourceManager({
   titleField: string;
   newRecord: RecordShape;
   disableDelete?: boolean;
+  enableArchive?: boolean;
 }) {
   const [items, setItems] = useState<RecordShape[]>(records);
   const [editing, setEditing] = useState<RecordShape | null>(null);
@@ -122,9 +131,41 @@ export default function AdminResourceManager({
     setStatus("Deleted.");
   }
 
+  async function toggleArchive(record: RecordShape) {
+    if (!record.id) {
+      return;
+    }
+
+    const isPublished = record.published !== false;
+    const action = isPublished ? "Archiving" : "Restoring";
+
+    setError(null);
+    setStatus(`${action}...`);
+    const response = await fetch(`/api/admin/cms/${table}/${record.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...record, published: !isPublished }),
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      setStatus(null);
+      setError(result.error || `${action} failed`);
+      return;
+    }
+
+    setItems((current) =>
+      current.map((item) => (item.id === result.data.id ? result.data : item))
+    );
+    if (editing?.id === result.data.id) {
+      setEditing(result.data);
+    }
+    setStatus(isPublished ? "Archived." : "Restored.");
+  }
+
   async function uploadImage(fieldName: string, file: File | null) {
     if (!file) {
-      return;
+      return "";
     }
 
     setError(null);
@@ -141,11 +182,12 @@ export default function AdminResourceManager({
     if (!response.ok) {
       setStatus(null);
       setError(result.error || "Upload failed");
-      return;
+      throw new Error(result.error || "Upload failed");
     }
 
     updateField(fieldName, result.url);
     setStatus("Image uploaded.");
+    return result.url as string;
   }
 
   return (
@@ -180,11 +222,22 @@ export default function AdminResourceManager({
                     {"published" in record
                       ? record.published
                         ? "Published"
-                        : "Unpublished"
+                        : enableArchive
+                          ? "Archived"
+                          : "Unpublished"
                       : "Active record"}
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  {enableArchive && "published" in record && (
+                    <button
+                      type="button"
+                      onClick={() => toggleArchive(record)}
+                      className="rounded-md border border-muted-teal px-3 py-2 text-sm font-medium text-dark-teal hover:bg-light-teal"
+                    >
+                      {record.published === false ? "Restore" : "Archive"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => beginEdit(record)}
@@ -260,7 +313,7 @@ function FieldInput({
   field: Field;
   value: unknown;
   onChange: (value: unknown) => void;
-  onUpload: (file: File | null) => void;
+  onUpload: (file: File | null) => Promise<string>;
 }) {
   const id = `field-${field.name}`;
   const stringValue = typeof value === "string" ? value : "";
@@ -297,20 +350,32 @@ function FieldInput({
   if (field.type === "image") {
     return (
       <FieldFrame field={field} id={id}>
-        <input
-          id={id}
-          type="text"
-          value={stringValue}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="/clubhouse.jpg or uploaded URL"
-          className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
-        />
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          onChange={(event) => onUpload(event.target.files?.[0] || null)}
-          className="mt-2 block w-full text-sm text-dark-teal file:mr-3 file:rounded-md file:border-0 file:bg-light-teal file:px-3 file:py-2 file:text-dark-teal"
-        />
+        {field.imageProcessing ? (
+          <CroppedImageUploader
+            value={stringValue}
+            onChange={onChange}
+            onUpload={onUpload}
+            aspect={field.imageProcessing.aspect}
+            targetWidth={field.imageProcessing.targetWidth}
+          />
+        ) : (
+          <>
+            <input
+              id={id}
+              type="text"
+              value={stringValue}
+              onChange={(event) => onChange(event.target.value)}
+              placeholder="/clubhouse.jpg or uploaded URL"
+              className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+            />
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={(event) => onUpload(event.target.files?.[0] || null)}
+              className="mt-2 block w-full text-sm text-dark-teal file:mr-3 file:rounded-md file:border-0 file:bg-light-teal file:px-3 file:py-2 file:text-dark-teal"
+            />
+          </>
+        )}
       </FieldFrame>
     );
   }
@@ -332,6 +397,26 @@ function FieldInput({
           rows={4}
           className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
         />
+      </FieldFrame>
+    );
+  }
+
+  if (field.type === "select") {
+    return (
+      <FieldFrame field={field} id={id}>
+        <select
+          id={id}
+          required={field.required}
+          value={stringValue}
+          onChange={(event) => onChange(event.target.value)}
+          className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+        >
+          {(field.options || []).map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </FieldFrame>
     );
   }

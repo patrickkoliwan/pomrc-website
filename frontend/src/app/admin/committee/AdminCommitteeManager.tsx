@@ -1,0 +1,502 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import type {
+  CommitteeMemberRecord,
+  CommitteePositionRecord,
+} from "@/lib/cms/types";
+
+type PositionForm = {
+  id?: string;
+  title: string;
+  display_order: number;
+  published: boolean;
+  member_id: string;
+  is_acting: boolean;
+  memberMode: "existing" | "new";
+  newMemberName: string;
+  newMemberPhotoUrl: string;
+  newMemberBio: string;
+  newMemberEmailAlias: string;
+};
+
+const emptyForm: PositionForm = {
+  title: "",
+  display_order: 0,
+  published: true,
+  member_id: "",
+  is_acting: false,
+  memberMode: "existing",
+  newMemberName: "",
+  newMemberPhotoUrl: "",
+  newMemberBio: "",
+  newMemberEmailAlias: "",
+};
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+export default function AdminCommitteeManager({
+  initialPositions,
+  initialMembers,
+}: {
+  initialPositions: CommitteePositionRecord[];
+  initialMembers: CommitteeMemberRecord[];
+}) {
+  const [positions, setPositions] =
+    useState<CommitteePositionRecord[]>(initialPositions);
+  const [members, setMembers] = useState<CommitteeMemberRecord[]>(initialMembers);
+  const [editing, setEditing] = useState<PositionForm | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const membersById = useMemo(
+    () => new Map(members.map((member) => [member.id, member])),
+    [members]
+  );
+  const sortedPositions = useMemo(
+    () => [...positions].sort((a, b) => a.display_order - b.display_order),
+    [positions]
+  );
+
+  function beginCreate() {
+    setEditing({
+      ...emptyForm,
+      display_order: positions.length,
+    });
+    setStatus(null);
+    setError(null);
+  }
+
+  function beginEdit(position: CommitteePositionRecord) {
+    setEditing({
+      ...emptyForm,
+      id: position.id,
+      title: position.title,
+      display_order: position.display_order,
+      published: position.published,
+      member_id: position.member_id ?? "",
+      is_acting: position.is_acting,
+      memberMode: position.member_id ? "existing" : "existing",
+    });
+    setStatus(null);
+    setError(null);
+  }
+
+  function updateField<K extends keyof PositionForm>(
+    field: K,
+    value: PositionForm[K]
+  ) {
+    setEditing((current) =>
+      current
+        ? {
+            ...current,
+            [field]: value,
+          }
+        : current
+    );
+  }
+
+  async function uploadNewMemberPhoto(file: File | null) {
+    if (!file || !editing) {
+      return;
+    }
+
+    setStatus("Uploading photo...");
+    setError(null);
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      setStatus(null);
+      setError(result.error || "Photo upload failed");
+      return;
+    }
+
+    updateField("newMemberPhotoUrl", result.url);
+    setStatus("Photo uploaded.");
+  }
+
+  async function savePosition(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editing) {
+      return;
+    }
+
+    setStatus("Saving position...");
+    setError(null);
+
+    let memberId = editing.member_id || null;
+
+    if (editing.memberMode === "new") {
+      if (!editing.newMemberName.trim()) {
+        setStatus(null);
+        setError("Enter a name for the new committee member.");
+        return;
+      }
+
+      const memberResponse = await fetch("/api/admin/cms/committee_members", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editing.newMemberName,
+          title: "Committee Member",
+          photo_url: editing.newMemberPhotoUrl,
+          bio: editing.newMemberBio,
+          email_alias: editing.newMemberEmailAlias,
+          display_order: members.length,
+          published: true,
+        }),
+      });
+      const memberResult = await memberResponse.json();
+
+      if (!memberResponse.ok) {
+        setStatus(null);
+        setError(memberResult.error || "Could not create committee member.");
+        return;
+      }
+
+      memberId = memberResult.data.id;
+      setMembers((current) => [...current, memberResult.data]);
+    }
+
+    const payload = {
+      title: editing.title,
+      display_order: editing.display_order,
+      published: editing.published,
+      member_id: memberId,
+      is_acting: editing.is_acting,
+    };
+    const isUpdate = Boolean(editing.id);
+    const response = await fetch(
+      isUpdate
+        ? `/api/admin/cms/committee_positions/${editing.id}`
+        : "/api/admin/cms/committee_positions",
+      {
+        method: isUpdate ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+    const result = await response.json();
+
+    if (!response.ok) {
+      setStatus(null);
+      setError(result.error || "Could not save position.");
+      return;
+    }
+
+    setPositions((current) =>
+      isUpdate
+        ? current.map((position) =>
+            position.id === result.data.id ? result.data : position
+          )
+        : [...current, result.data]
+    );
+    setEditing(null);
+    setStatus("Saved.");
+  }
+
+  async function deletePosition(position: CommitteePositionRecord) {
+    if (
+      !window.confirm(
+        `Delete the ${position.title} position? The assigned member will be kept.`
+      )
+    ) {
+      return;
+    }
+
+    setStatus("Deleting position...");
+    setError(null);
+    const response = await fetch(`/api/admin/cms/committee_positions/${position.id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      setStatus(null);
+      setError(result.error || "Could not delete position.");
+      return;
+    }
+
+    setPositions((current) =>
+      current.filter((currentPosition) => currentPosition.id !== position.id)
+    );
+    setStatus("Position deleted. The member record was kept.");
+  }
+
+  return (
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_440px]">
+      <section className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-dark-teal">
+              Committee positions
+            </h2>
+            <p className="mt-1 text-sm text-muted-teal">
+              Create positions, fill them, or leave them hidden until ready.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={beginCreate}
+            className="rounded-md bg-dark-teal px-4 py-2 text-sm font-semibold text-light-cream hover:bg-muted-teal"
+          >
+            Create position
+          </button>
+        </div>
+
+        {sortedPositions.length === 0 ? (
+          <p className="rounded-md border border-muted-teal/20 bg-light-teal p-4 text-dark-teal">
+            No committee positions yet.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {sortedPositions.map((position) => {
+              const member = position.member_id
+                ? membersById.get(position.member_id)
+                : null;
+              const isEditing = editing?.id === position.id;
+
+              return (
+                <div
+                  key={position.id}
+                  className={`flex h-full flex-col gap-3 rounded-lg border border-muted-teal/20 p-4 ${
+                    isEditing ? "bg-light-teal/30 ring-2 ring-dark-teal/30" : ""
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-light-teal text-sm font-bold text-dark-teal">
+                      {member ? getInitials(member.name) : "-"}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold text-dark-teal">
+                          {position.title}
+                        </h3>
+                        {position.is_acting && (
+                          <span className="rounded-full bg-light-teal px-2 py-0.5 text-xs font-semibold text-dark-teal">
+                            Acting
+                          </span>
+                        )}
+                        {!position.published && (
+                          <span className="rounded-full bg-deep-red/10 px-2 py-0.5 text-xs font-semibold text-deep-red">
+                            Hidden
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-teal">
+                        {member ? member.name : "Unfilled"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-auto grid w-full grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => beginEdit(position)}
+                      className="rounded-md border border-muted-teal px-3 py-2 text-sm font-medium text-dark-teal hover:bg-light-teal"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deletePosition(position)}
+                      className="rounded-md border border-deep-red px-3 py-2 text-sm font-medium text-deep-red hover:bg-deep-red/10"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {status && <p className="mt-4 text-sm text-muted-teal">{status}</p>}
+        {error && <p className="mt-4 text-sm text-deep-red">{error}</p>}
+      </section>
+
+      <aside className="rounded-lg bg-white p-6 shadow-sm">
+        <h2 className="mb-5 text-xl font-semibold text-dark-teal">
+          {editing?.id ? "Edit position" : "Create position"}
+        </h2>
+
+        {editing ? (
+          <form onSubmit={savePosition} className="space-y-5">
+            <Field label="Position title">
+              <input
+                value={editing.title}
+                required
+                onChange={(event) => updateField("title", event.target.value)}
+                className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+              />
+            </Field>
+
+            <Field label="Display order">
+              <input
+                type="number"
+                min={0}
+                value={editing.display_order}
+                onChange={(event) =>
+                  updateField("display_order", Number(event.target.value))
+                }
+                className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+              />
+            </Field>
+
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 text-sm font-medium text-dark-teal">
+                <input
+                  type="checkbox"
+                  checked={editing.published}
+                  onChange={(event) =>
+                    updateField("published", event.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-muted-teal text-dark-teal"
+                />
+                Show this filled position publicly
+              </label>
+              <label className="flex items-center gap-3 text-sm font-medium text-dark-teal">
+                <input
+                  type="checkbox"
+                  checked={editing.is_acting}
+                  onChange={(event) =>
+                    updateField("is_acting", event.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-muted-teal text-dark-teal"
+                />
+                Mark as Acting
+              </label>
+            </div>
+
+            <Field label="Fill position">
+              <div className="grid gap-2">
+                <select
+                  value={editing.memberMode}
+                  onChange={(event) =>
+                    updateField(
+                      "memberMode",
+                      event.target.value as PositionForm["memberMode"]
+                    )
+                  }
+                  className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                >
+                  <option value="existing">Use existing member</option>
+                  <option value="new">Create new member</option>
+                </select>
+
+                {editing.memberMode === "existing" ? (
+                  <select
+                    value={editing.member_id}
+                    onChange={(event) =>
+                      updateField("member_id", event.target.value)
+                    }
+                    className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                  >
+                    <option value="">Unfilled</option>
+                    {members.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="grid gap-3 rounded-md border border-muted-teal/20 bg-light-teal/50 p-3">
+                    <input
+                      placeholder="Name"
+                      value={editing.newMemberName}
+                      onChange={(event) =>
+                        updateField("newMemberName", event.target.value)
+                      }
+                      className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                    />
+                    <input
+                      placeholder="Photo URL"
+                      value={editing.newMemberPhotoUrl}
+                      onChange={(event) =>
+                        updateField("newMemberPhotoUrl", event.target.value)
+                      }
+                      className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                    />
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={(event) =>
+                        uploadNewMemberPhoto(event.target.files?.[0] || null)
+                      }
+                      className="block w-full text-sm text-dark-teal file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-dark-teal"
+                    />
+                    <textarea
+                      placeholder="Bio"
+                      rows={3}
+                      value={editing.newMemberBio}
+                      onChange={(event) =>
+                        updateField("newMemberBio", event.target.value)
+                      }
+                      className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                    />
+                    <input
+                      placeholder="Email alias"
+                      value={editing.newMemberEmailAlias}
+                      onChange={(event) =>
+                        updateField("newMemberEmailAlias", event.target.value)
+                      }
+                      className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                    />
+                  </div>
+                )}
+              </div>
+            </Field>
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="rounded-md bg-dark-teal px-4 py-2 text-sm font-semibold text-light-cream hover:bg-muted-teal"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-md border border-muted-teal px-4 py-2 text-sm font-semibold text-dark-teal hover:bg-light-teal"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <p className="text-sm leading-6 text-dark-teal/75">
+            Select a position to edit, or create a new position.
+          </p>
+        )}
+      </aside>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-medium text-dark-teal">{label}</span>
+      <span className="mt-2 block">{children}</span>
+    </label>
+  );
+}

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { parseCmsPayload } from "@/lib/cms/schemas";
 import type { CmsTable } from "@/lib/cms/types";
@@ -7,7 +8,9 @@ import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
 const tables: CmsTable[] = [
   "club_events",
+  "junior_programs",
   "committee_members",
+  "committee_positions",
   "contact_routing",
 ];
 
@@ -17,6 +20,20 @@ function parseTable(table: string): CmsTable {
   }
 
   return table as CmsTable;
+}
+
+function revalidateCmsPaths(table: CmsTable) {
+  if (table === "club_events") {
+    revalidatePath("/events");
+  }
+
+  if (table === "junior_programs") {
+    revalidatePath("/junior-programs");
+  }
+
+  if (table === "committee_members" || table === "committee_positions") {
+    revalidatePath("/club-committee");
+  }
 }
 
 export async function PUT(
@@ -43,6 +60,8 @@ export async function PUT(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    revalidateCmsPaths(table);
 
     return NextResponse.json({ data });
   } catch (error) {
@@ -75,6 +94,8 @@ export async function DELETE(
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    revalidateCmsPaths(table);
 
     return NextResponse.json({ success: true });
   } catch (error) {

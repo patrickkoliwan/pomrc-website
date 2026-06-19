@@ -51,6 +51,35 @@ export type ClubEventRecord = {
   updated_at: string;
 };
 
+export type JuniorProgramType = "tennis" | "squash" | "other";
+
+export type JuniorProgramRecord = {
+  id: string;
+  title: string;
+  program_type: JuniorProgramType;
+  description: string;
+  day_text: string;
+  time_text: string;
+  location: string;
+  price: string;
+  image_url: string | null;
+  display_order: number;
+  published: boolean;
+  updated_at: string;
+};
+
+export type JuniorProgramNoticeSection =
+  | "page"
+  | JuniorProgramType;
+
+export type JuniorProgramNoticeRecord = {
+  id: string;
+  message: string;
+  section: JuniorProgramNoticeSection;
+  enabled: boolean;
+  updated_at: string;
+};
+
 export type CommitteeMemberRecord = {
   id: string;
   name: string;
@@ -61,6 +90,20 @@ export type CommitteeMemberRecord = {
   display_order: number;
   published: boolean;
   updated_at: string;
+};
+
+export type CommitteePositionRecord = {
+  id: string;
+  title: string;
+  display_order: number;
+  published: boolean;
+  member_id: string | null;
+  is_acting: boolean;
+  updated_at: string;
+};
+
+export type CommitteePositionWithMember = CommitteePositionRecord & {
+  member: CommitteeMemberRecord | null;
 };
 
 export type ContactRoutingRecord = {
@@ -77,12 +120,18 @@ export type CmsTable =
   | "site_pages"
   | "facilities"
   | "club_events"
+  | "junior_programs"
+  | "junior_program_notice"
   | "committee_members"
+  | "committee_positions"
   | "contact_routing";
 
 export type CmsRecord =
   | SitePage
   | FacilityRecord
   | ClubEventRecord
+  | JuniorProgramRecord
+  | JuniorProgramNoticeRecord
   | CommitteeMemberRecord
+  | CommitteePositionRecord
   | ContactRoutingRecord;

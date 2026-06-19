@@ -1,5 +1,8 @@
+export type JuniorProgramType = "tennis" | "squash" | "other";
+
 export interface JuniorProgram {
   id: string;
+  type: JuniorProgramType;
   title: string;
   description: string;
   date: string;
@@ -13,6 +16,7 @@ export interface JuniorProgram {
 export const juniorPrograms: JuniorProgram[] = [
   {
     id: "saturday-beginners-squash",
+    type: "squash",
     title: "Saturday Beginners Squash",
     description:
       "Introduction to squash for junior players. Learn the basics of the game in a fun and supportive environment.",
@@ -25,6 +29,7 @@ export const juniorPrograms: JuniorProgram[] = [
   },
   {
     id: "saturday-junior-tennis",
+    type: "tennis",
     title: "Saturday Junior Tennis",
     description:
       "Combined Saturday tennis program. Beginners (Red Ball) focus on fundamentals, while Intermediate & Advanced players work on technique and match play.",
@@ -37,6 +42,7 @@ export const juniorPrograms: JuniorProgram[] = [
   },
   {
     id: "wednesday-teenage-tennis",
+    type: "tennis",
     title: "Wednesday Teenage Tennis",
     description:
       "Tennis program specifically designed for teenagers (ages 12-18) who are new to the sport.",
@@ -49,6 +55,7 @@ export const juniorPrograms: JuniorProgram[] = [
   },
   {
     id: "tuesday-thursday-junior-tennis",
+    type: "tennis",
     title: "Tuesday & Thursday Junior Tennis",
     description:
       "Twice-weekly junior tennis covering fundamentals for beginners and technique/strategy for advanced players.",

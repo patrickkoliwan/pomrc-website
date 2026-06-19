@@ -10,7 +10,7 @@ export default function FacilitiesContent({
 }: FacilitiesContentProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
         {facilities.map((facility) => (
           <FacilityCardMinimal
             key={facility.id}
