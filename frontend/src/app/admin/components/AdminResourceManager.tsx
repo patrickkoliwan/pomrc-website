@@ -2,7 +2,20 @@
 
 import { useMemo, useState } from "react";
 import type { CmsTable, SitePageBodySection } from "@/lib/cms/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import CroppedImageUploader from "./CroppedImageUploader";
+import {
+  CMS_IMAGE_PRESETS,
+  compressImageForWeb,
+  supportedUploadAccept,
+  validateSourceImage,
+} from "./image-processing";
 
 type FieldType =
   | "text"
@@ -38,6 +51,7 @@ export default function AdminResourceManager({
   newRecord,
   disableDelete = false,
   enableArchive = false,
+  resourceLabel = { singular: "Record", plural: "Records" },
 }: {
   table: CmsTable;
   records: RecordShape[];
@@ -46,6 +60,7 @@ export default function AdminResourceManager({
   newRecord: RecordShape;
   disableDelete?: boolean;
   enableArchive?: boolean;
+  resourceLabel?: { singular: string; plural: string };
 }) {
   const [items, setItems] = useState<RecordShape[]>(records);
   const [editing, setEditing] = useState<RecordShape | null>(null);
@@ -61,6 +76,12 @@ export default function AdminResourceManager({
 
   function beginEdit(record: RecordShape) {
     setEditing({ ...record });
+    setError(null);
+    setStatus(null);
+  }
+
+  function closeEditing() {
+    setEditing(null);
     setError(null);
     setStatus(null);
   }
@@ -105,12 +126,14 @@ export default function AdminResourceManager({
 
       return [...current, result.data];
     });
-    setEditing(null);
-    setStatus("Saved.");
+    closeEditing();
   }
 
   async function deleteRecord(record: RecordShape) {
-    if (!record.id || !window.confirm("Delete this record permanently?")) {
+    if (
+      !record.id ||
+      !window.confirm(`Delete this ${resourceLabel.singular.toLowerCase()} permanently?`)
+    ) {
       return;
     }
 
@@ -163,7 +186,7 @@ export default function AdminResourceManager({
     setStatus(isPublished ? "Archived." : "Restored.");
   }
 
-  async function uploadImage(fieldName: string, file: File | null) {
+  async function uploadProcessedImage(fieldName: string, file: File | null) {
     if (!file) {
       return "";
     }
@@ -190,22 +213,59 @@ export default function AdminResourceManager({
     return result.url as string;
   }
 
+  async function uploadRawImage(fieldName: string, file: File | null) {
+    if (!file) {
+      return "";
+    }
+
+    if (file.type !== "image/gif") {
+      const validationError = validateSourceImage(file);
+
+      if (validationError) {
+        setError(validationError);
+        throw new Error(validationError);
+      }
+    }
+
+    setError(null);
+    setStatus("Preparing image...");
+
+    try {
+      const processed =
+        file.type === "image/gif"
+          ? file
+          : await compressImageForWeb(file, CMS_IMAGE_PRESETS.directUpload);
+
+      return uploadProcessedImage(fieldName, processed);
+    } catch (uploadError) {
+      setStatus(null);
+      const message =
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Could not prepare this photo for upload.";
+      setError(message);
+      throw new Error(message);
+    }
+  }
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+    <>
       <section className="rounded-lg bg-white p-6 shadow-sm">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-semibold text-dark-teal">Records</h2>
+          <h2 className="text-xl font-semibold text-dark-teal">
+            {resourceLabel.plural}
+          </h2>
           <button
             type="button"
             onClick={beginCreate}
             className="rounded-md bg-dark-teal px-4 py-2 text-sm font-semibold text-light-cream hover:bg-muted-teal"
           >
-            Add new
+            Add {resourceLabel.singular}
           </button>
         </div>
         {sortedItems.length === 0 ? (
           <p className="rounded-md border border-muted-teal/20 bg-light-teal p-4 text-dark-teal">
-            No records yet.
+            No {resourceLabel.plural.toLowerCase()} yet.
           </p>
         ) : (
           <div className="divide-y divide-muted-teal/20">
@@ -225,7 +285,7 @@ export default function AdminResourceManager({
                         : enableArchive
                           ? "Archived"
                           : "Unpublished"
-                      : "Active record"}
+                      : `Active ${resourceLabel.singular.toLowerCase()}`}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -261,46 +321,65 @@ export default function AdminResourceManager({
         )}
       </section>
 
-      <aside className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="mb-5 text-xl font-semibold text-dark-teal">
-          {editing?.id ? "Edit record" : "Add record"}
-        </h2>
-        {editing ? (
-          <form onSubmit={saveRecord} className="space-y-5">
-            {fields.map((field) => (
-              <FieldInput
-                key={field.name}
-                field={field}
-                value={editing[field.name]}
-                onChange={(value) => updateField(field.name, value)}
-                onUpload={(file) => uploadImage(field.name, file)}
-              />
-            ))}
-            {error && <p className="text-sm text-deep-red">{error}</p>}
-            {status && <p className="text-sm text-muted-teal">{status}</p>}
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                className="rounded-md bg-dark-teal px-4 py-2 text-sm font-semibold text-light-cream hover:bg-muted-teal"
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditing(null)}
-                className="rounded-md border border-muted-teal px-4 py-2 text-sm font-semibold text-dark-teal hover:bg-light-teal"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : (
-          <p className="text-sm leading-6 text-dark-teal/75">
-            Select a record to edit, or add a new one.
-          </p>
-        )}
-      </aside>
-    </div>
+      <Dialog open={!!editing} onOpenChange={(open) => !open && closeEditing()}>
+        <DialogContent className="fixed inset-0 flex h-dvh max-h-dvh w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-muted-teal/30 bg-light-cream p-0">
+          <DialogHeader className="shrink-0 space-y-1 border-b border-muted-teal/30 px-4 py-4 text-left sm:px-6">
+            <DialogTitle className="text-xl font-semibold text-dark-teal sm:text-2xl">
+              {editing?.id
+                ? `Edit ${resourceLabel.singular}`
+                : `Add ${resourceLabel.singular}`}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {editing?.id
+                ? `Edit ${resourceLabel.singular.toLowerCase()} details`
+                : `Create a new ${resourceLabel.singular.toLowerCase()}`}
+            </DialogDescription>
+          </DialogHeader>
+
+          {editing && (
+            <>
+              <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                <form
+                  id="admin-resource-form"
+                  onSubmit={saveRecord}
+                  className="space-y-5"
+                >
+                  {fields.map((field) => (
+                    <FieldInput
+                      key={field.name}
+                      field={field}
+                      value={editing[field.name]}
+                      onChange={(value) => updateField(field.name, value)}
+                      onUpload={(file) => uploadProcessedImage(field.name, file)}
+                      onRawUpload={(file) => uploadRawImage(field.name, file)}
+                    />
+                  ))}
+                  {error && <p className="text-sm text-deep-red">{error}</p>}
+                  {status && <p className="text-sm text-muted-teal">{status}</p>}
+                </form>
+              </div>
+
+              <div className="flex shrink-0 gap-2 border-t border-muted-teal/30 px-4 py-4 sm:px-6">
+                <button
+                  type="submit"
+                  form="admin-resource-form"
+                  className="rounded-md bg-dark-teal px-4 py-2 text-sm font-semibold text-light-cream hover:bg-muted-teal"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={closeEditing}
+                  className="rounded-md border border-muted-teal px-4 py-2 text-sm font-semibold text-dark-teal hover:bg-light-teal"
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -309,11 +388,13 @@ function FieldInput({
   value,
   onChange,
   onUpload,
+  onRawUpload,
 }: {
   field: Field;
   value: unknown;
   onChange: (value: unknown) => void;
   onUpload: (file: File | null) => Promise<string>;
+  onRawUpload: (file: File | null) => Promise<string>;
 }) {
   const id = `field-${field.name}`;
   const stringValue = typeof value === "string" ? value : "";
@@ -370,8 +451,11 @@ function FieldInput({
             />
             <input
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={(event) => onUpload(event.target.files?.[0] || null)}
+              accept={supportedUploadAccept}
+              onChange={(event) => {
+                void onRawUpload(event.target.files?.[0] || null);
+                event.target.value = "";
+              }}
               className="mt-2 block w-full text-sm text-dark-teal file:mr-3 file:rounded-md file:border-0 file:bg-light-teal file:px-3 file:py-2 file:text-dark-teal"
             />
           </>

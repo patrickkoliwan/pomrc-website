@@ -113,6 +113,8 @@ async function upsertData() {
         event_date: event.isWeekly ? null : event.date,
         start_time: event.time,
         end_time: null,
+        price: event.price ?? null,
+        members_free: false,
         image_url: null,
         display_order: index,
         published: true,

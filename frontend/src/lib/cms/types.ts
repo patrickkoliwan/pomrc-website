@@ -45,6 +45,8 @@ export type ClubEventRecord = {
   event_date: string | null;
   start_time: string | null;
   end_time: string | null;
+  price: string | null;
+  members_free: boolean;
   image_url: string | null;
   display_order: number;
   published: boolean;

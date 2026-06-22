@@ -5,6 +5,10 @@ import type {
   CommitteeMemberRecord,
   CommitteePositionRecord,
 } from "@/lib/cms/types";
+import CroppedImageUploader from "../components/CroppedImageUploader";
+import { CMS_IMAGE_PRESETS } from "../components/image-presets";
+
+const COMMITTEE_PHOTO_PRESET = CMS_IMAGE_PRESETS.squarePortrait;
 
 type PositionForm = {
   id?: string;
@@ -14,6 +18,7 @@ type PositionForm = {
   member_id: string;
   is_acting: boolean;
   memberMode: "existing" | "new";
+  existingMemberPhotoUrl: string;
   newMemberName: string;
   newMemberPhotoUrl: string;
   newMemberBio: string;
@@ -27,6 +32,7 @@ const emptyForm: PositionForm = {
   member_id: "",
   is_acting: false,
   memberMode: "existing",
+  existingMemberPhotoUrl: "",
   newMemberName: "",
   newMemberPhotoUrl: "",
   newMemberBio: "",
@@ -84,6 +90,9 @@ export default function AdminCommitteeManager({
       member_id: position.member_id ?? "",
       is_acting: position.is_acting,
       memberMode: position.member_id ? "existing" : "existing",
+      existingMemberPhotoUrl: position.member_id
+        ? membersById.get(position.member_id)?.photo_url ?? ""
+        : "",
     });
     setStatus(null);
     setError(null);
@@ -104,8 +113,19 @@ export default function AdminCommitteeManager({
   }
 
   async function uploadNewMemberPhoto(file: File | null) {
+    return uploadCommitteePhoto(file, "newMemberPhotoUrl");
+  }
+
+  async function uploadExistingMemberPhoto(file: File | null) {
+    return uploadCommitteePhoto(file, "existingMemberPhotoUrl");
+  }
+
+  async function uploadCommitteePhoto(
+    file: File | null,
+    field: "existingMemberPhotoUrl" | "newMemberPhotoUrl"
+  ) {
     if (!file || !editing) {
-      return;
+      return "";
     }
 
     setStatus("Uploading photo...");
@@ -121,11 +141,26 @@ export default function AdminCommitteeManager({
     if (!response.ok) {
       setStatus(null);
       setError(result.error || "Photo upload failed");
-      return;
+      throw new Error(result.error || "Photo upload failed");
     }
 
-    updateField("newMemberPhotoUrl", result.url);
+    updateField(field, result.url);
     setStatus("Photo uploaded.");
+    return result.url as string;
+  }
+
+  function updateExistingMember(memberId: string) {
+    const member = memberId ? membersById.get(memberId) : null;
+
+    setEditing((current) =>
+      current
+        ? {
+            ...current,
+            member_id: memberId,
+            existingMemberPhotoUrl: member?.photo_url ?? "",
+          }
+        : current
+    );
   }
 
   async function savePosition(event: React.FormEvent<HTMLFormElement>) {
@@ -170,6 +205,38 @@ export default function AdminCommitteeManager({
 
       memberId = memberResult.data.id;
       setMembers((current) => [...current, memberResult.data]);
+    } else if (memberId) {
+      const member = membersById.get(memberId);
+      const nextPhotoUrl = editing.existingMemberPhotoUrl.trim();
+
+      if (member && nextPhotoUrl !== (member.photo_url ?? "")) {
+        const memberResponse = await fetch(
+          `/api/admin/cms/committee_members/${member.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...member,
+              photo_url: nextPhotoUrl,
+            }),
+          }
+        );
+        const memberResult = await memberResponse.json();
+
+        if (!memberResponse.ok) {
+          setStatus(null);
+          setError(memberResult.error || "Could not update committee member photo.");
+          return;
+        }
+
+        setMembers((current) =>
+          current.map((currentMember) =>
+            currentMember.id === memberResult.data.id
+              ? memberResult.data
+              : currentMember
+          )
+        );
+      }
     }
 
     const payload = {
@@ -398,20 +465,34 @@ export default function AdminCommitteeManager({
                 </select>
 
                 {editing.memberMode === "existing" ? (
-                  <select
-                    value={editing.member_id}
-                    onChange={(event) =>
-                      updateField("member_id", event.target.value)
-                    }
-                    className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
-                  >
-                    <option value="">Unfilled</option>
-                    {members.map((member) => (
-                      <option key={member.id} value={member.id}>
-                        {member.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="grid gap-3">
+                    <select
+                      value={editing.member_id}
+                      onChange={(event) => updateExistingMember(event.target.value)}
+                      className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
+                    >
+                      <option value="">Unfilled</option>
+                      {members.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.name}
+                        </option>
+                      ))}
+                    </select>
+                    {editing.member_id && (
+                      <CroppedImageUploader
+                        value={editing.existingMemberPhotoUrl}
+                        onChange={(value) =>
+                          updateField("existingMemberPhotoUrl", value)
+                        }
+                        onUpload={uploadExistingMemberPhoto}
+                        aspect={COMMITTEE_PHOTO_PRESET.aspect}
+                        targetWidth={COMMITTEE_PHOTO_PRESET.targetWidth}
+                        maxSizeMB={COMMITTEE_PHOTO_PRESET.maxSizeMB}
+                        previewAlt="Committee member photo preview"
+                        helpText="Phone photos welcome, including HEIC. Large files are compressed automatically; crop preview exports as a square WebP around 800px wide."
+                      />
+                    )}
+                  </div>
                 ) : (
                   <div className="grid gap-3 rounded-md border border-muted-teal/20 bg-light-teal/50 p-3">
                     <input
@@ -422,21 +503,15 @@ export default function AdminCommitteeManager({
                       }
                       className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
                     />
-                    <input
-                      placeholder="Photo URL"
+                    <CroppedImageUploader
                       value={editing.newMemberPhotoUrl}
-                      onChange={(event) =>
-                        updateField("newMemberPhotoUrl", event.target.value)
-                      }
-                      className="w-full rounded-md border border-muted-teal px-3 py-2 text-dark-teal focus:outline-none focus:ring-2 focus:ring-dark-teal"
-                    />
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      onChange={(event) =>
-                        uploadNewMemberPhoto(event.target.files?.[0] || null)
-                      }
-                      className="block w-full text-sm text-dark-teal file:mr-3 file:rounded-md file:border-0 file:bg-white file:px-3 file:py-2 file:text-dark-teal"
+                      onChange={(value) => updateField("newMemberPhotoUrl", value)}
+                      onUpload={uploadNewMemberPhoto}
+                      aspect={COMMITTEE_PHOTO_PRESET.aspect}
+                      targetWidth={COMMITTEE_PHOTO_PRESET.targetWidth}
+                      maxSizeMB={COMMITTEE_PHOTO_PRESET.maxSizeMB}
+                      previewAlt="Committee member photo preview"
+                      helpText="Phone photos welcome, including HEIC. Large files are compressed automatically; crop preview exports as a square WebP around 800px wide."
                     />
                     <textarea
                       placeholder="Bio"

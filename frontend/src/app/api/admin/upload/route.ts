@@ -2,8 +2,15 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/firebase/admin";
 import { getStorageBucketName, getSupabaseAdminClient } from "@/lib/supabase/server";
 
-const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const maxBytes = 5 * 1024 * 1024;
+const allowedTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+];
+const maxBytes = 15 * 1024 * 1024;
 
 function safeFileName(name: string) {
   const extension = name.split(".").pop()?.toLowerCase() || "bin";
@@ -36,7 +43,7 @@ export async function POST(request: Request) {
 
   if (file.size > maxBytes) {
     return NextResponse.json(
-      { error: "Images must be 5MB or smaller" },
+      { error: "Images must be 15MB or smaller" },
       { status: 400 }
     );
   }

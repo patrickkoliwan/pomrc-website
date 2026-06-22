@@ -25,17 +25,17 @@ function formatEventDateLabel(event: Event): string {
 
 function EventTeaserRow({ event }: { event: Event }) {
   return (
-    <li className="flex items-center gap-3 min-w-0">
-      <span
-        className="shrink-0 rounded-full bg-light-teal px-2.5 py-1 text-xs font-medium text-dark-teal"
-      >
-        {formatEventDateLabel(event)}
-      </span>
-      <span className="min-w-0 flex-1 truncate font-medium text-dark-teal text-sm sm:text-base">
+    <li className="flex flex-col gap-1.5 min-w-0 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex items-center justify-between gap-3 sm:contents">
+        <span className="shrink-0 rounded-full bg-light-teal px-2.5 py-1 text-xs font-medium text-dark-teal">
+          {formatEventDateLabel(event)}
+        </span>
+        <span className="shrink-0 text-sm text-dark-teal/70 sm:order-3">
+          {event.time}
+        </span>
+      </div>
+      <span className="font-medium text-dark-teal text-sm sm:min-w-0 sm:flex-1 sm:truncate sm:text-base">
         {event.title}
-      </span>
-      <span className="shrink-0 text-sm text-dark-teal/70">
-        {event.time}
       </span>
     </li>
   );

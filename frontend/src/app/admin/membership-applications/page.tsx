@@ -8,7 +8,7 @@ export default async function AdminMembershipApplicationsPage() {
   const applications = await listMembershipApplications();
 
   return (
-    <AdminShell title="Membership Applications" email={admin.email}>
+    <AdminShell title="Membership Applications" email={admin.email} hideNav>
       <MembershipApplicationsManager applications={applications} />
     </AdminShell>
   );

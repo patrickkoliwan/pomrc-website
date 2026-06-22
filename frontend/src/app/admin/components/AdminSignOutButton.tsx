@@ -4,7 +4,7 @@ export default function AdminSignOutButton() {
   return (
     <button
       type="button"
-      className="rounded-md border border-muted-teal px-3 py-2 font-medium text-dark-teal hover:bg-light-teal"
+      className="rounded-md border border-deep-red bg-deep-red px-4 py-2 text-sm font-semibold text-light-cream hover:bg-deep-red/90"
       onClick={async () => {
         await fetch("/api/admin/session", { method: "DELETE" });
         window.location.href = "/admin/login";

@@ -8,6 +8,7 @@ export interface Event {
   location: string;
   isWeekly: boolean;
   price?: string;
+  membersFree?: boolean;
   imageUrl?: string;
 }
 

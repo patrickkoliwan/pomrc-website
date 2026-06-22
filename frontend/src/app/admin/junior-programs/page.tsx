@@ -1,5 +1,6 @@
 import AdminResourceManager from "../components/AdminResourceManager";
 import AdminShell from "../components/AdminShell";
+import { CMS_IMAGE_PRESETS } from "../components/image-presets";
 import JuniorProgramNoticeEditor from "./JuniorProgramNoticeEditor";
 import { getJuniorProgramNotice, listCmsRecords } from "@/lib/cms/admin-data";
 import type { JuniorProgramRecord } from "@/lib/cms/types";
@@ -73,8 +74,11 @@ export default async function AdminJuniorProgramsPage() {
               label: "Image",
               type: "image",
               helpText:
-                "Upload JPG, PNG, or WebP images under 5MB. Crop preview exports as a 3:2 WebP around 1200px wide.",
-              imageProcessing: { aspect: 3 / 2, targetWidth: 1200 },
+                "Phone photos welcome, including HEIC. Large files are compressed automatically; crop preview exports as a 3:2 WebP around 1200px wide.",
+              imageProcessing: {
+                aspect: CMS_IMAGE_PRESETS.landscapePromo.aspect,
+                targetWidth: CMS_IMAGE_PRESETS.landscapePromo.targetWidth,
+              },
             },
             { name: "display_order", label: "Display order", type: "number" },
             {

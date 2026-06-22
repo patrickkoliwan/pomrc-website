@@ -34,7 +34,10 @@ function isActiveRoute(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-const Navbar = () => {
+const desktopNavLinkClass =
+  "whitespace-nowrap text-sm leading-none text-light-cream transition-colors hover:text-muted-teal xl:text-base";
+
+const Navbar = ({ showAdminHome = false }: { showAdminHome?: boolean }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -44,9 +47,9 @@ const Navbar = () => {
 
   return (
     <nav className="relative z-50 bg-dark-teal py-3 shadow-md">
-      <div className="container mx-auto flex items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-3">
-          <div className="relative h-12 w-12 md:h-20 md:w-20">
+      <div className="container mx-auto flex items-center justify-between gap-4 px-4">
+        <Link href="/" className="flex shrink-0 items-center space-x-3">
+          <div className="relative h-12 w-12 md:h-16 md:w-16 lg:h-20 lg:w-20">
             <Image
               src="/logo.png"
               alt="POMRC Logo"
@@ -58,23 +61,30 @@ const Navbar = () => {
           <span className="text-xl font-bold text-light-cream">POMRC</span>
         </Link>
 
-        <div className="hidden space-x-8 md:flex">
+        <div
+          className="hidden min-w-0 flex-1 items-center justify-end gap-x-3 lg:flex lg:gap-x-3 xl:gap-x-5"
+        >
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-lg text-light-cream transition-colors hover:text-muted-teal"
+              className={desktopNavLinkClass}
             >
               {link.label}
             </Link>
           ))}
+          {showAdminHome && (
+            <Link href="/admin" className={desktopNavLinkClass}>
+              Admin Home
+            </Link>
+          )}
         </div>
 
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <SheetTrigger asChild>
             <button
               type="button"
-              className="p-2 text-light-cream focus:outline-none md:hidden"
+              className="shrink-0 p-2 text-light-cream focus:outline-none lg:hidden"
               aria-label="Open menu"
               aria-expanded={isMenuOpen}
             >
@@ -147,6 +157,35 @@ const Navbar = () => {
                     </li>
                   );
                 })}
+                {showAdminHome && (
+                  <li
+                    className="animate-in fade-in slide-in-from-right-4 fill-mode-both duration-300"
+                    style={{ animationDelay: `${navLinks.length * 40}ms` }}
+                  >
+                    <Link
+                      href="/admin"
+                      className={cn(
+                        "flex min-h-[48px] items-center justify-between border-b border-dark-teal/10 px-4 py-3 text-dark-teal transition-colors hover:bg-light-teal active:bg-light-teal",
+                        isActiveRoute(pathname, "/admin") &&
+                          "bg-light-teal font-semibold text-deep-red"
+                      )}
+                      aria-current={
+                        isActiveRoute(pathname, "/admin") ? "page" : undefined
+                      }
+                    >
+                      <span>Admin Home</span>
+                      <ChevronRight
+                        className={cn(
+                          "h-4 w-4 shrink-0",
+                          isActiveRoute(pathname, "/admin")
+                            ? "text-deep-red"
+                            : "text-muted-teal"
+                        )}
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
 

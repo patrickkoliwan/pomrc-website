@@ -34,6 +34,8 @@ create table if not exists public.club_events (
   event_date date,
   start_time text,
   end_time text,
+  price text,
+  members_free boolean default false,
   image_url text,
   display_order integer default 0,
   published boolean default true,
@@ -281,3 +283,6 @@ using (bucket_id = 'club-media');
 
 -- Uploads are intentionally not allowed for browser clients. The Next.js
 -- admin upload route uses the service role key after Firebase admin checks.
+
+alter table public.club_events add column if not exists price text;
+alter table public.club_events add column if not exists members_free boolean default false;

@@ -7,6 +7,7 @@ import type { Json } from "@/lib/cms/types";
 import {
   membershipApplicationStatuses,
   membershipPaymentStatuses,
+  sortMembershipApplications,
   type MembershipApplicationRecord,
   type MembershipEmailStatus,
 } from "./types";
@@ -85,7 +86,7 @@ export async function listMembershipApplications() {
     throw new Error(error.message);
   }
 
-  return (data || []) as MembershipApplicationRecord[];
+  return sortMembershipApplications((data || []) as MembershipApplicationRecord[]);
 }
 
 export async function updateMembershipApplication(

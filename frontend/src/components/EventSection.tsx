@@ -36,11 +36,6 @@ export default function EventSection({
   return (
     <section className={isLast ? "mb-0" : "mb-10"}>
       <div className="mb-6 border-b border-dark-teal/20 pb-3">
-        {size === "default" && (
-          <p className="mb-1 text-sm font-medium uppercase tracking-wide text-deep-red">
-            Events
-          </p>
-        )}
         <h2 className={headingClasses}>{title}</h2>
       </div>
 

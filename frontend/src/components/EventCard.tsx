@@ -18,9 +18,24 @@ interface EventCardProps {
   variant?: EventCardVariant;
 }
 
+function formatEventPricing(event: Event): string | null {
+  const parts: string[] = [];
+
+  if (event.price) {
+    parts.push(event.price);
+  }
+
+  if (event.membersFree) {
+    parts.push("Members free");
+  }
+
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
 function EventMeta({ event, className = "mt-1" }: { event: Event; className?: string }) {
   const dateLabel = event.isWeekly ? `Every ${event.date}` : event.date;
-  const trailing = [event.location, event.price].filter(Boolean).join(" · ");
+  const pricing = formatEventPricing(event);
+  const trailing = [event.location, pricing].filter(Boolean).join(" · ");
 
   return (
     <div
@@ -50,7 +65,7 @@ function EventDescription({ description }: { description: string }) {
 
   if (description.length <= DESCRIPTION_TRUNCATE_LENGTH) {
     return (
-      <p className="mt-2 text-sm leading-relaxed text-dark-teal/80">
+      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-teal/80">
         {description}
       </p>
     );
@@ -59,7 +74,7 @@ function EventDescription({ description }: { description: string }) {
   return (
     <div className="mt-2">
       <p
-        className={`text-sm leading-relaxed text-dark-teal/80 ${
+        className={`whitespace-pre-line text-sm leading-relaxed text-dark-teal/80 ${
           expanded ? "" : "line-clamp-2"
         }`}
       >
@@ -127,15 +142,24 @@ function EventListRow({ event }: { event: Event }) {
           <button
             type="button"
             onClick={() => setPosterOpen(true)}
-            className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-light-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-teal focus-visible:ring-offset-2"
+            className={
+              event.isWeekly
+                ? "relative shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-teal focus-visible:ring-offset-2"
+                : "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-light-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-teal focus-visible:ring-offset-2"
+            }
             aria-label={`View full poster for ${event.title}`}
           >
             <Image
               src={event.imageUrl}
               alt={event.title}
-              fill
-              className="object-contain p-1"
-              sizes="64px"
+              width={event.isWeekly ? 80 : 64}
+              height={64}
+              className={
+                event.isWeekly
+                  ? "h-16 w-auto max-w-[6rem] object-contain"
+                  : "h-full w-full object-contain p-1"
+              }
+              sizes={event.isWeekly ? "96px" : "64px"}
             />
           </button>
           <EventPosterModal

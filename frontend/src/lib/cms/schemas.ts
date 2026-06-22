@@ -52,9 +52,17 @@ export const facilitySchema = z.object({
   published,
 });
 
+const optionalEventDescription = z
+  .string()
+  .trim()
+  .max(400, "Description must be 400 characters or less")
+  .optional()
+  .nullable()
+  .transform((value) => (value ? value : null));
+
 export const clubEventSchema = z.object({
   title: z.string().trim().min(1).max(160),
-  description: optionalText,
+  description: optionalEventDescription,
   day: optionalText,
   event_date: z
     .string()
@@ -64,6 +72,8 @@ export const clubEventSchema = z.object({
     .transform((value) => (value ? value : null)),
   start_time: optionalText,
   end_time: optionalText,
+  price: optionalText,
+  members_free: z.coerce.boolean().default(false),
   image_url: optionalUrlOrPath,
   display_order: displayOrder,
   published,

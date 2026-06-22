@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getCurrentAdmin } from "@/lib/firebase/admin";
 import { clubDescription, clubName, siteUrl } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -51,11 +52,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const admin = await getCurrentAdmin();
+
   return (
     <html lang="en">
       <head>
@@ -66,7 +69,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} bg-light-cream min-h-screen flex flex-col`}
       >
-        <Navbar />
+        <Navbar showAdminHome={!!admin} />
         <div className="flex-grow">{children}</div>
         <Footer />
       </body>
