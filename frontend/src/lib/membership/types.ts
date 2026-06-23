@@ -38,6 +38,9 @@ export type MembershipApplicationRecord = {
   membership_status: string;
   membership_type: string;
   submitted_data: MembershipFormData;
+  quoted_amount: number | null;
+  quoted_price_label: string | null;
+  pricing_period_id: string | null;
 };
 
 export const applicationStatusLabels: Record<MembershipApplicationStatus, string> =

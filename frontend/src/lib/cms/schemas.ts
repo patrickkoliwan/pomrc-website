@@ -92,21 +92,10 @@ export const juniorProgramSchema = z.object({
   published,
 });
 
-export const juniorProgramNoticeSchema = z
-  .object({
-    message: z.string().trim().max(1200).default(""),
-    section: z.enum(["page", "tennis", "squash", "other"]).default("tennis"),
-    enabled: z.coerce.boolean().default(true),
-  })
-  .superRefine((notice, context) => {
-    if (notice.enabled && notice.message.length === 0) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Enter a notice message or disable the notice.",
-        path: ["message"],
-      });
-    }
-  });
+export const juniorProgramNoticeSchema = z.object({
+  message: z.string().trim().max(1200).default(""),
+  enabled: z.coerce.boolean().default(false),
+});
 
 export const committeeMemberSchema = z.object({
   name: z.string().trim().min(1).max(160),

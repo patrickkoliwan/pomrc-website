@@ -4,10 +4,8 @@ import {
   getPublishedJuniorProgramNotice,
   getPublishedJuniorPrograms,
 } from "@/lib/cms/public-data";
-import type {
-  JuniorProgramNoticeRecord,
-  JuniorProgramNoticeSection,
-} from "@/lib/cms/types";
+import type { JuniorProgramNoticeRecord } from "@/lib/cms/types";
+import { isJuniorProgramNoticePublic } from "@/lib/junior-programs/notice";
 import {
   groupJuniorPrograms,
   mapJuniorProgram,
@@ -62,7 +60,7 @@ export default async function JuniorPrograms() {
           </div>
         )}
 
-        <JuniorProgramNotice notice={notice} placement="page" />
+        <JuniorProgramNotice notice={notice} />
 
         {tennisPrograms.length > 0 && (
           <section id="tennis" className="mb-16 scroll-mt-24">
@@ -82,7 +80,6 @@ export default async function JuniorPrograms() {
                   child&apos;s journey toward tennis excellence on the
                   international stage.
                 </p>
-                <JuniorProgramNotice notice={notice} placement="tennis" />
               </div>
             </div>
 
@@ -116,7 +113,6 @@ export default async function JuniorPrograms() {
                   Games. Endorsed by the PNG Squash Rackets Federation, our
                   program is your child&apos;s gateway to sporting excellence.
                 </p>
-                <JuniorProgramNotice notice={notice} placement="squash" />
               </div>
             </div>
 
@@ -138,7 +134,6 @@ export default async function JuniorPrograms() {
               <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
                 Other Programs
               </h2>
-              <JuniorProgramNotice notice={notice} placement="other" />
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -173,22 +168,16 @@ export default async function JuniorPrograms() {
 
 function JuniorProgramNotice({
   notice,
-  placement,
 }: {
   notice: JuniorProgramNoticeRecord | null;
-  placement: JuniorProgramNoticeSection;
 }) {
-  if (!notice?.enabled || notice.section !== placement || !notice.message.trim()) {
+  if (!notice || !isJuniorProgramNoticePublic(notice)) {
     return null;
   }
 
-  const marginClass = placement === "page" ? "mb-12" : "mb-6";
-
   return (
-    <div
-      className={`bg-red-100 border-l-4 border-red-500 text-red-700 p-4 ${marginClass}`}
-    >
-      <p className="font-bold mb-2">Important Notice:</p>
+    <div className="mb-12 border-l-4 border-red-500 bg-red-100 p-4 text-red-700">
+      <p className="mb-2 font-bold">Important Notice:</p>
       <p className="whitespace-pre-line">{notice.message}</p>
     </div>
   );

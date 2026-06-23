@@ -1,24 +1,25 @@
 import "server-only";
 
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth, type DecodedIdToken } from "firebase-admin/auth";
+import type { DecodedIdToken } from "firebase-admin/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getEnvPrivateKey, getEnvValue } from "@/lib/env";
 
 export const ADMIN_SESSION_COOKIE = "pomrc_admin_session";
 
-function getPrivateKey() {
-  return process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-}
-
-export function getFirebaseAdminAuth() {
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = getPrivateKey();
+export async function getFirebaseAdminAuth() {
+  const projectId = getEnvValue("FIREBASE_PROJECT_ID");
+  const clientEmail = getEnvValue("FIREBASE_CLIENT_EMAIL");
+  const privateKey = getEnvPrivateKey("FIREBASE_PRIVATE_KEY");
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error("Firebase Admin environment variables are not configured");
   }
+
+  const [{ cert, getApps, initializeApp }, { getAuth }] = await Promise.all([
+    import("firebase-admin/app"),
+    import("firebase-admin/auth"),
+  ]);
 
   const app =
     getApps().length > 0
@@ -35,7 +36,7 @@ export function getFirebaseAdminAuth() {
 }
 
 export function getAdminAllowlist() {
-  return (process.env.INITIAL_ADMIN_EMAILS || "")
+  return (getEnvValue("INITIAL_ADMIN_EMAILS") || "")
     .split(",")
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
@@ -51,7 +52,8 @@ export function isApprovedAdmin(token: DecodedIdToken) {
 }
 
 export async function verifyAdminIdToken(idToken: string) {
-  const token = await getFirebaseAdminAuth().verifyIdToken(idToken);
+  const auth = await getFirebaseAdminAuth();
+  const token = await auth.verifyIdToken(idToken);
 
   if (!isApprovedAdmin(token)) {
     throw new Error("User is not an approved admin");
@@ -62,7 +64,8 @@ export async function verifyAdminIdToken(idToken: string) {
 
 export async function createAdminSessionCookie(idToken: string) {
   await verifyAdminIdToken(idToken);
-  return getFirebaseAdminAuth().createSessionCookie(idToken, {
+  const auth = await getFirebaseAdminAuth();
+  return auth.createSessionCookie(idToken, {
     expiresIn: 1000 * 60 * 60 * 12,
   });
 }
@@ -75,10 +78,8 @@ export async function getCurrentAdmin() {
   }
 
   try {
-    const token = await getFirebaseAdminAuth().verifySessionCookie(
-      sessionCookie,
-      true
-    );
+    const auth = await getFirebaseAdminAuth();
+    const token = await auth.verifySessionCookie(sessionCookie, true);
     return isApprovedAdmin(token) ? token : null;
   } catch {
     return null;

@@ -9,7 +9,7 @@ export default async function AdminContactRoutingPage() {
   const records = await listCmsRecords<ContactRoutingRecord>("contact_routing");
 
   return (
-    <AdminShell title="Contact Routing" email={admin.email}>
+    <AdminShell title="Contact Routing" email={admin.email} hideNav>
       <AdminResourceManager
         table="contact_routing"
         records={records}

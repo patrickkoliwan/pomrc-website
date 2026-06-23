@@ -5,6 +5,7 @@ import { membershipFormSchema } from '@/app/membership/utils/schema';
 import { checkRateLimit, getClientIp } from '@/app/utils/rateLimit';
 import {
   createMembershipApplication,
+  resolveApplicationPricing,
   updateMembershipApplicationEmailStatus,
 } from '@/lib/membership/applications';
 
@@ -32,11 +33,11 @@ export async function POST(request: Request) {
     
     // Validate the data
     const validatedData = membershipFormSchema.parse(data);
-
-    const application = await createMembershipApplication(validatedData);
+    const pricing = await resolveApplicationPricing(validatedData.membershipType);
+    const application = await createMembershipApplication(validatedData, pricing);
 
     try {
-      await sendMembershipEmail(validatedData);
+      await sendMembershipEmail(validatedData, pricing.quotedPriceLabel);
       try {
         await updateMembershipApplicationEmailStatus(application.id, {
           email_status: 'sent',

@@ -159,7 +159,7 @@ export default function MembershipFormWizard({
         return (
           <div className="space-y-6">
             <Declaration register={register} errors={errors} compact />
-            <Payment variant="borderless" />
+            <Payment variant="borderless" membershipType={membershipType} />
           </div>
         );
       default:

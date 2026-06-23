@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { juniorProgramNoticeSchema } from "@/lib/cms/schemas";
+import { normalizeJuniorProgramNoticeInput } from "@/lib/junior-programs/notice";
 import { requireAdmin } from "@/lib/firebase/admin";
 import { getSupabaseAdminClient } from "@/lib/supabase/server";
 
@@ -34,14 +35,18 @@ export async function PUT(request: Request) {
   await requireAdmin();
 
   try {
-    const payload = juniorProgramNoticeSchema.parse(await request.json());
+    const payload = juniorProgramNoticeSchema.parse(
+      normalizeJuniorProgramNoticeInput(await request.json())
+    );
     const supabase = getSupabaseAdminClient();
     const { data, error } = await supabase
       .from("junior_program_notice")
       .upsert(
         {
           id: "primary",
-          ...payload,
+          message: payload.message,
+          enabled: payload.enabled,
+          section: "page",
           updated_at: new Date().toISOString(),
         },
         { onConflict: "id" }
@@ -59,7 +64,10 @@ export async function PUT(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid notice payload", details: error.errors },
+        {
+          error: error.errors[0]?.message || "Invalid notice payload",
+          details: error.errors,
+        },
         { status: 400 }
       );
     }

@@ -388,6 +388,13 @@ function ApplicationDetails({
         rows={[
           ["Status", formatValue(data.membershipStatus)],
           ["Type", formatValue(data.membershipType)],
+          [
+            "Quoted amount",
+            application.quoted_price_label ??
+              (application.quoted_amount != null
+                ? `K${application.quoted_amount}`
+                : null),
+          ],
           ["Email notification", emailStatusLabels[application.email_status]],
           ["Email error", application.email_error],
         ]}

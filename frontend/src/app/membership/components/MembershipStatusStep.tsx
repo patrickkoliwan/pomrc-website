@@ -6,8 +6,10 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import LoadingSpinner from "./LoadingSpinner";
-import { INPUT_CLASS, MEMBERSHIP_TYPES } from "../constants";
+import { INPUT_CLASS } from "../constants";
 import type { MembershipFormData } from "../utils/types";
+import { useMembershipPricing } from "./MembershipPricingProvider";
+import { membershipTierIds } from "@/lib/membership/pricing-types";
 
 interface MembershipStatusStepProps {
   register: UseFormRegister<MembershipFormData>;
@@ -24,6 +26,8 @@ export default function MembershipStatusStep({
   stepErrors = {},
   isLoading = false,
 }: MembershipStatusStepProps) {
+  const { getTierContent } = useMembershipPricing();
+
   if (isLoading) return <LoadingSpinner />;
 
   const membershipStatus = watch("membershipStatus");
@@ -165,7 +169,9 @@ export default function MembershipStatusStep({
           Membership Type <span className="text-deep-red">*</span>
         </h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {Object.entries(MEMBERSHIP_TYPES).map(([key, value]) => (
+          {membershipTierIds.map((key) => {
+            const value = getTierContent(key);
+            return (
             <div key={key} className="relative">
               <input
                 type="radio"
@@ -187,9 +193,15 @@ export default function MembershipStatusStep({
                 <span className="mt-2 text-lg font-bold text-deep-red">
                   {value.price}
                 </span>
+                {value.isProrata && (
+                  <span className="mt-1 text-xs text-dark-teal/70">
+                    {value.period}
+                  </span>
+                )}
               </label>
             </div>
-          ))}
+            );
+          })}
         </div>
         {(errors.membershipType || stepErrors.membershipType) &&
           !membershipType && (

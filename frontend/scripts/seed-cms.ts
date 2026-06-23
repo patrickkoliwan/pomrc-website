@@ -162,7 +162,7 @@ async function upsertData() {
       {
         id: "primary",
         message: juniorProgramNotice,
-        section: "tennis",
+        section: "page",
         enabled: true,
       },
       { onConflict: "id" }

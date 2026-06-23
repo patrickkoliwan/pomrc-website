@@ -1,11 +1,3 @@
-export interface MembershipTierContent {
-  key: string;
-  title: string;
-  price: string;
-  period: string;
-  highlights: string[];
-}
-
 export interface DetailRowContent {
   label: string;
   value: string;
@@ -21,46 +13,6 @@ export interface AccessPanelContent {
   heading: string;
   points: string[];
 }
-
-export const MEMBERSHIP_TIERS: MembershipTierContent[] = [
-  {
-    key: "FAMILY",
-    title: "Family",
-    price: "K600",
-    period: "per year",
-    highlights: [
-      "2 adults + children under 18",
-      "Up to 21 if in full-time study",
-    ],
-  },
-  {
-    key: "SINGLE_ADULT",
-    title: "Single Adult",
-    price: "K360",
-    period: "per year",
-    highlights: ["For individuals aged 19 and above"],
-  },
-  {
-    key: "JUNIORS",
-    title: "Junior",
-    price: "K70",
-    period: "per year",
-    highlights: [
-      "Aged 18 and under",
-      "Up to 21 if in full-time study",
-    ],
-  },
-  {
-    key: "SOCIAL",
-    title: "Social",
-    price: "K180",
-    period: "per year",
-    highlights: [
-      "Full club benefits and amenities",
-      "Non-member court fees apply",
-    ],
-  },
-];
 
 export const COURT_USE_FEE_GROUPS: FeeGroupContent[] = [
   {

@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getEnvValue } from "@/lib/env";
 
 interface EmailConfig {
   user: string;
@@ -21,12 +22,13 @@ export function escapeHtml(value: string | number | boolean | undefined) {
 }
 
 export function getEmailConfig(): EmailConfig {
-  const user = process.env.ZOHO_SMTP_USER || process.env.EMAIL_USER;
-  const password = process.env.ZOHO_SMTP_PASSWORD || process.env.EMAIL_PASSWORD;
-  const host = process.env.ZOHO_SMTP_HOST || "smtp.zoho.com";
-  const port = Number(process.env.ZOHO_SMTP_PORT || 465);
-  const from = process.env.ZOHO_DEFAULT_FROM || user;
-  const defaultTo = process.env.ZOHO_DEFAULT_TO || process.env.EMAIL_TO;
+  const user = getEnvValue("ZOHO_SMTP_USER") || getEnvValue("EMAIL_USER");
+  const password =
+    getEnvValue("ZOHO_SMTP_PASSWORD") || getEnvValue("EMAIL_PASSWORD");
+  const host = getEnvValue("ZOHO_SMTP_HOST") || "smtp.zoho.com";
+  const port = Number(getEnvValue("ZOHO_SMTP_PORT") || 465);
+  const from = getEnvValue("ZOHO_DEFAULT_FROM") || user;
+  const defaultTo = getEnvValue("ZOHO_DEFAULT_TO") || getEnvValue("EMAIL_TO");
 
   const missingKeys = [
     ["ZOHO_SMTP_USER", user],

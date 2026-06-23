@@ -1,14 +1,20 @@
+"use client";
+
 import InfoSection from "./InfoSection";
-import {
-  MEMBERSHIP_TIERS,
-  SECTION_INTROS,
-} from "../content/membership-content";
+import { SECTION_INTROS } from "../content/membership-content";
+import { useMembershipPricing } from "./MembershipPricingProvider";
+import { membershipTierIds } from "@/lib/membership/pricing-types";
 
 export default function PricingTierCards() {
+  const { getTierContent } = useMembershipPricing();
+  const tiers = membershipTierIds
+    .map((tierId) => getTierContent(tierId))
+    .filter((tier) => tier.title);
+
   return (
     <InfoSection title="Membership Categories" intro={SECTION_INTROS.categories}>
       <div className="divide-y divide-muted-teal/30 sm:grid sm:grid-cols-2 sm:gap-3 sm:divide-y-0 lg:grid-cols-4">
-        {MEMBERSHIP_TIERS.map((tier) => (
+        {tiers.map((tier) => (
           <div
             key={tier.key}
             className="py-4 first:pt-0 last:pb-0 sm:flex sm:h-full sm:flex-col sm:rounded-lg sm:bg-light-teal sm:p-4 sm:py-4"

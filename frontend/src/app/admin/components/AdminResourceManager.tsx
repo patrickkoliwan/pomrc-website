@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { CmsTable, SitePageBodySection } from "@/lib/cms/types";
+import { Toast } from "@/components/ui/toast";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ import {
   supportedUploadAccept,
   validateSourceImage,
 } from "./image-processing";
+import { sortJuniorProgramRecordItems } from "@/lib/junior-programs/programs";
 
 type FieldType =
   | "text"
@@ -66,7 +68,14 @@ export default function AdminResourceManager({
   const [editing, setEditing] = useState<RecordShape | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const sortedItems = useMemo(() => items, [items]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const sortedItems = useMemo(() => {
+    if (table === "junior_programs") {
+      return sortJuniorProgramRecordItems(items);
+    }
+
+    return items;
+  }, [items, table]);
 
   function beginCreate() {
     setEditing({ ...newRecord });
@@ -126,6 +135,20 @@ export default function AdminResourceManager({
 
       return [...current, result.data];
     });
+
+    if (table === "junior_programs") {
+      setStatus(null);
+      setToastMessage(
+        isUpdate
+          ? `${resourceLabel.singular} saved`
+          : `${resourceLabel.singular} created`
+      );
+      window.setTimeout(() => {
+        closeEditing();
+      }, 1200);
+      return;
+    }
+
     closeEditing();
   }
 
@@ -250,6 +273,11 @@ export default function AdminResourceManager({
 
   return (
     <>
+      <Toast
+        message={toastMessage ?? ""}
+        open={toastMessage !== null}
+        onClose={() => setToastMessage(null)}
+      />
       <section className="rounded-lg bg-white p-6 shadow-sm">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold text-dark-teal">

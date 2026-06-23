@@ -14,7 +14,7 @@ export default async function AdminJuniorProgramsPage() {
   ]);
 
   return (
-    <AdminShell title="Junior Programs" email={admin.email}>
+    <AdminShell title="Junior Programs" email={admin.email} hideNav>
       <div className="space-y-6">
         <JuniorProgramNoticeEditor notice={notice} />
         <AdminResourceManager
@@ -22,6 +22,10 @@ export default async function AdminJuniorProgramsPage() {
           records={records}
           titleField="title"
           enableArchive
+          resourceLabel={{
+            singular: "Junior Program",
+            plural: "Junior Programs",
+          }}
           newRecord={{
             title: "",
             program_type: "tennis",
@@ -31,7 +35,6 @@ export default async function AdminJuniorProgramsPage() {
             location: "",
             price: "",
             image_url: "",
-            display_order: 0,
             published: true,
           }}
           fields={[
@@ -58,7 +61,8 @@ export default async function AdminJuniorProgramsPage() {
               label: "Date/day text",
               type: "text",
               required: true,
-              helpText: "Examples: Saturday, Tuesday & Thursday.",
+              helpText:
+                "Examples: Saturday, Tuesday & Thursday. Programs are ordered automatically by day of the week.",
             },
             {
               name: "time_text",
@@ -80,7 +84,6 @@ export default async function AdminJuniorProgramsPage() {
                 targetWidth: CMS_IMAGE_PRESETS.landscapePromo.targetWidth,
               },
             },
-            { name: "display_order", label: "Display order", type: "number" },
             {
               name: "published",
               label: "Visible on junior programs page",

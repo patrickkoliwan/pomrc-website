@@ -28,7 +28,10 @@ function formatPlayingLevel(level: string) {
   return level.replace(/_/g, ' ');
 }
 
-export async function sendMembershipEmail(data: MembershipFormData) {
+export async function sendMembershipEmail(
+  data: MembershipFormData,
+  quotedPriceLabel?: string | null
+) {
   // Start building the HTML email content
   let htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
@@ -43,6 +46,7 @@ export async function sendMembershipEmail(data: MembershipFormData) {
         ${createSectionHeader('Membership Details')}
         ${createTableRow('Membership Status', data.membershipStatus.toUpperCase())}
         ${createTableRow('Membership Type', data.membershipType.replace(/_/g, ' '))}
+        ${quotedPriceLabel ? createTableRow('Quoted Amount', quotedPriceLabel) : ''}
   `;
 
   // Add family details if present

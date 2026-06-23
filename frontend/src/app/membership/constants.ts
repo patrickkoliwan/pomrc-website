@@ -1,29 +1,3 @@
-export const MEMBERSHIP_TYPES = {
-  FAMILY: {
-    title: "Family",
-    description:
-      "Two adults and children aged 18 and under, or up to 21 if in full-time study.",
-    price: "K600.00",
-  },
-  SINGLE_ADULT: {
-    title: "Single Adult",
-    description: "For individuals aged 19 years and above.",
-    price: "K360.00",
-  },
-  JUNIORS: {
-    title: "Junior",
-    description:
-      "For those aged 18 and under, or up to 21 if enrolled in full-time study.",
-    price: "K70.00",
-  },
-  SOCIAL: {
-    title: "Social",
-    description:
-      "All club benefits and amenities; standard non-member court fees apply for court use.",
-    price: "K180.00",
-  },
-} as const;
-
 export const INPUT_CLASS =
   "mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-dark-teal focus:ring-dark-teal px-3 py-2 min-h-[44px] text-base";
 

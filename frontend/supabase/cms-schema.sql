@@ -107,6 +107,52 @@ create table if not exists public.contact_routing (
   updated_at timestamptz default now()
 );
 
+create table if not exists public.membership_tiers (
+  id text primary key,
+  title text not null,
+  description text not null default '',
+  highlights jsonb not null default '[]'::jsonb,
+  annual_amount numeric(10, 2) not null,
+  display_order integer default 0,
+  active boolean default true,
+  updated_at timestamptz default now(),
+  constraint membership_tiers_id_check check (
+    id in ('FAMILY', 'SINGLE_ADULT', 'JUNIORS', 'SOCIAL')
+  )
+);
+
+create table if not exists public.membership_prorata_periods (
+  id uuid primary key default gen_random_uuid(),
+  label text not null,
+  start_month integer not null,
+  start_day integer not null,
+  end_month integer not null,
+  end_day integer not null,
+  active boolean default true,
+  display_order integer default 0,
+  updated_at timestamptz default now(),
+  constraint membership_prorata_periods_start_month_check check (
+    start_month between 1 and 12
+  ),
+  constraint membership_prorata_periods_end_month_check check (
+    end_month between 1 and 12
+  ),
+  constraint membership_prorata_periods_start_day_check check (
+    start_day between 1 and 31
+  ),
+  constraint membership_prorata_periods_end_day_check check (
+    end_day between 1 and 31
+  )
+);
+
+create table if not exists public.membership_prorata_rates (
+  id uuid primary key default gen_random_uuid(),
+  period_id uuid not null references public.membership_prorata_periods(id) on delete cascade,
+  tier_id text not null references public.membership_tiers(id) on delete cascade,
+  amount numeric(10, 2) not null,
+  unique (period_id, tier_id)
+);
+
 create table if not exists public.membership_applications (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz default now(),
@@ -123,6 +169,9 @@ create table if not exists public.membership_applications (
   membership_status text not null,
   membership_type text not null,
   submitted_data jsonb not null,
+  quoted_amount numeric(10, 2),
+  quoted_price_label text,
+  pricing_period_id uuid references public.membership_prorata_periods(id) on delete set null,
   constraint membership_applications_status_check check (
     status in ('pending_review', 'approved', 'rejected', 'completed')
   ),
@@ -189,6 +238,16 @@ create trigger set_membership_applications_updated_at
 before update on public.membership_applications
 for each row execute function public.set_updated_at();
 
+drop trigger if exists set_membership_tiers_updated_at on public.membership_tiers;
+create trigger set_membership_tiers_updated_at
+before update on public.membership_tiers
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_membership_prorata_periods_updated_at on public.membership_prorata_periods;
+create trigger set_membership_prorata_periods_updated_at
+before update on public.membership_prorata_periods
+for each row execute function public.set_updated_at();
+
 alter table public.site_pages enable row level security;
 alter table public.facilities enable row level security;
 alter table public.club_events enable row level security;
@@ -198,6 +257,9 @@ alter table public.committee_members enable row level security;
 alter table public.committee_positions enable row level security;
 alter table public.contact_routing enable row level security;
 alter table public.membership_applications enable row level security;
+alter table public.membership_tiers enable row level security;
+alter table public.membership_prorata_periods enable row level security;
+alter table public.membership_prorata_rates enable row level security;
 
 drop policy if exists "Public can read published pages" on public.site_pages;
 create policy "Public can read published pages"
@@ -286,3 +348,58 @@ using (bucket_id = 'club-media');
 
 alter table public.club_events add column if not exists price text;
 alter table public.club_events add column if not exists members_free boolean default false;
+
+alter table public.membership_applications
+  add column if not exists quoted_amount numeric(10, 2);
+alter table public.membership_applications
+  add column if not exists quoted_price_label text;
+alter table public.membership_applications
+  add column if not exists pricing_period_id uuid references public.membership_prorata_periods(id) on delete set null;
+
+insert into public.membership_tiers (
+  id,
+  title,
+  description,
+  highlights,
+  annual_amount,
+  display_order,
+  active
+)
+values
+  (
+    'FAMILY',
+    'Family',
+    'Two adults and children aged 18 and under, or up to 21 if in full-time study.',
+    '["2 adults + children under 18", "Up to 21 if in full-time study"]'::jsonb,
+    600.00,
+    0,
+    true
+  ),
+  (
+    'SINGLE_ADULT',
+    'Single Adult',
+    'For individuals aged 19 years and above.',
+    '["For individuals aged 19 and above"]'::jsonb,
+    360.00,
+    1,
+    true
+  ),
+  (
+    'JUNIORS',
+    'Junior',
+    'For those aged 18 and under, or up to 21 if enrolled in full-time study.',
+    '["Aged 18 and under", "Up to 21 if in full-time study"]'::jsonb,
+    70.00,
+    2,
+    true
+  ),
+  (
+    'SOCIAL',
+    'Social',
+    'All club benefits and amenities; standard non-member court fees apply for court use.',
+    '["Full club benefits and amenities", "Non-member court fees apply"]'::jsonb,
+    180.00,
+    3,
+    true
+  )
+on conflict (id) do nothing;

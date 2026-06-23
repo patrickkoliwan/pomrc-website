@@ -2,6 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 import type { MembershipFormData } from "@/app/membership/utils/types";
+import type { MembershipType } from "@/app/membership/utils/types";
 import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/cms/types";
 import {
@@ -11,6 +12,10 @@ import {
   type MembershipApplicationRecord,
   type MembershipEmailStatus,
 } from "./types";
+import {
+  resolveMembershipPrice,
+  type ResolvedMembershipPrice,
+} from "./pricing-types";
 
 export const membershipApplicationUpdateSchema = z.object({
   status: z.enum(membershipApplicationStatuses),
@@ -27,7 +32,10 @@ export type MembershipApplicationUpdate = z.infer<
   typeof membershipApplicationUpdateSchema
 >;
 
-export function toMembershipApplicationInsert(data: MembershipFormData) {
+export function toMembershipApplicationInsert(
+  data: MembershipFormData,
+  pricing: ResolvedMembershipPrice
+) {
   return {
     first_name: data.personalInfo.firstName,
     surname: data.personalInfo.surname,
@@ -36,14 +44,34 @@ export function toMembershipApplicationInsert(data: MembershipFormData) {
     membership_status: data.membershipStatus,
     membership_type: data.membershipType,
     submitted_data: data as unknown as Json,
+    quoted_amount: pricing.amount,
+    quoted_price_label: pricing.quotedPriceLabel,
+    pricing_period_id: pricing.periodId,
   };
 }
 
-export async function createMembershipApplication(data: MembershipFormData) {
+export async function resolveApplicationPricing(
+  membershipType: MembershipType
+): Promise<ResolvedMembershipPrice> {
+  const config = await getMembershipPricingFromDb();
+  return resolveMembershipPrice(membershipType, config);
+}
+
+async function getMembershipPricingFromDb() {
+  const { getMembershipPricing } = await import("./pricing");
+  return getMembershipPricing();
+}
+
+export async function createMembershipApplication(
+  data: MembershipFormData,
+  pricing?: ResolvedMembershipPrice
+) {
+  const resolved =
+    pricing ?? (await resolveApplicationPricing(data.membershipType));
   const supabase = getSupabaseAdminClient();
   const { data: record, error } = await supabase
     .from("membership_applications")
-    .insert(toMembershipApplicationInsert(data))
+    .insert(toMembershipApplicationInsert(data, resolved))
     .select("*")
     .single();
 

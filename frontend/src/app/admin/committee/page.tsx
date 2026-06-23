@@ -16,7 +16,7 @@ export default async function AdminCommitteePage() {
   const uniqueRecords = dedupeCommitteeMembers(records);
 
   return (
-    <AdminShell title="Committee Members" email={admin.email}>
+    <AdminShell title="Committee Members" email={admin.email} hideNav>
       <AdminCommitteeManager
         initialPositions={positions}
         initialMembers={uniqueRecords}
