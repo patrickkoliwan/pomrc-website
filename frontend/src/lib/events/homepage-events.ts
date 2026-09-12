@@ -1,5 +1,5 @@
 import { weeklyEvents, upcomingEvents, type Event } from "@/data/events";
-import { getPublishedEvents } from "@/lib/cms/public-data";
+import { getPublishedEventsOrNull } from "@/lib/cms/public-data";
 import { hasSupabasePublicConfig } from "@/lib/supabase/server";
 import {
   classifyPublishedEvents,
@@ -13,7 +13,11 @@ export async function getHomepageEventPreview(max = 3): Promise<Event[]> {
     return [...upcomingEvents, ...weeklyEvents].slice(0, max);
   }
 
-  const cmsEvents = await getPublishedEvents();
+  const cmsEvents = await getPublishedEventsOrNull();
+  if (!cmsEvents) {
+    return [...upcomingEvents, ...weeklyEvents].slice(0, max);
+  }
+
   const { weekly, upcoming } = classifyPublishedEvents(cmsEvents);
   const mappedUpcoming = upcoming.map(mapClubEvent);
   const mappedWeekly = weekly.map(mapClubEvent);

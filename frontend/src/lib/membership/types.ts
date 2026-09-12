@@ -15,12 +15,22 @@ export const membershipPaymentStatuses = [
 
 export const membershipEmailStatuses = ["not_sent", "sent", "failed"] as const;
 
+export const membershipApprovalEmailStatuses = [
+  "not_sent",
+  "sent",
+  "failed",
+  "skipped",
+] as const;
+
 export type MembershipApplicationStatus =
   (typeof membershipApplicationStatuses)[number];
 
 export type MembershipPaymentStatus = (typeof membershipPaymentStatuses)[number];
 
 export type MembershipEmailStatus = (typeof membershipEmailStatuses)[number];
+
+export type MembershipApprovalEmailStatus =
+  (typeof membershipApprovalEmailStatuses)[number];
 
 export type MembershipApplicationRecord = {
   id: string;
@@ -31,6 +41,9 @@ export type MembershipApplicationRecord = {
   admin_notes: string | null;
   email_status: MembershipEmailStatus;
   email_error: string | null;
+  approval_email_status: MembershipApprovalEmailStatus;
+  approval_email_error: string | null;
+  approval_email_sent_at: string | null;
   first_name: string;
   surname: string;
   email: string;
@@ -61,6 +74,16 @@ export const emailStatusLabels: Record<MembershipEmailStatus, string> = {
   not_sent: "Not sent",
   sent: "Sent",
   failed: "Failed",
+};
+
+export const approvalEmailStatusLabels: Record<
+  MembershipApprovalEmailStatus,
+  string
+> = {
+  not_sent: "Not sent",
+  sent: "Sent",
+  failed: "Failed",
+  skipped: "Skipped",
 };
 
 export type ApplicationDisplayStatusVariant =

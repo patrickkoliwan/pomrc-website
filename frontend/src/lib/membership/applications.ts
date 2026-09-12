@@ -5,11 +5,14 @@ import type { MembershipFormData } from "@/app/membership/utils/types";
 import type { MembershipType } from "@/app/membership/utils/types";
 import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/cms/types";
+import { sendMembershipApprovalEmail } from "@/app/membership/utils/approvalEmail";
+import { isValidApplicantEmail } from "@/lib/membership/email-validation";
 import {
   membershipApplicationStatuses,
   membershipPaymentStatuses,
   sortMembershipApplications,
   type MembershipApplicationRecord,
+  type MembershipApprovalEmailStatus,
   type MembershipEmailStatus,
 } from "./types";
 import {
@@ -50,6 +53,24 @@ export function toMembershipApplicationInsert(
   };
 }
 
+function isMissingSchemaCacheColumnError(error: { code?: string; message?: string }) {
+  return (
+    error.code === "PGRST204" &&
+    Boolean(error.message?.includes("schema cache"))
+  );
+}
+
+async function insertMembershipApplication(
+  payload: Partial<ReturnType<typeof toMembershipApplicationInsert>>
+) {
+  const supabase = getSupabaseAdminClient();
+  return supabase
+    .from("membership_applications")
+    .insert(payload)
+    .select("*")
+    .single();
+}
+
 export async function resolveApplicationPricing(
   membershipType: MembershipType
 ): Promise<ResolvedMembershipPrice> {
@@ -68,12 +89,20 @@ export async function createMembershipApplication(
 ) {
   const resolved =
     pricing ?? (await resolveApplicationPricing(data.membershipType));
-  const supabase = getSupabaseAdminClient();
-  const { data: record, error } = await supabase
-    .from("membership_applications")
-    .insert(toMembershipApplicationInsert(data, resolved))
-    .select("*")
-    .single();
+  const payload = toMembershipApplicationInsert(data, resolved);
+  let { data: record, error } = await insertMembershipApplication(payload);
+
+  if (
+    error &&
+    isMissingSchemaCacheColumnError(error) &&
+    error.message.includes("'pricing_period_id'")
+  ) {
+    const legacyPayload: Partial<typeof payload> = { ...payload };
+    delete legacyPayload.pricing_period_id;
+    const retry = await insertMembershipApplication(legacyPayload);
+    record = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     throw new Error(error.message);
@@ -101,6 +130,88 @@ export async function updateMembershipApplicationEmailStatus(
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function updateMembershipApplicationApprovalEmailStatus(
+  id: string,
+  payload: {
+    approval_email_status: MembershipApprovalEmailStatus;
+    approval_email_error?: string | null;
+    approval_email_sent_at?: string | null;
+  }
+) {
+  const supabase = getSupabaseAdminClient();
+  const { error } = await supabase
+    .from("membership_applications")
+    .update({
+      approval_email_status: payload.approval_email_status,
+      approval_email_error: payload.approval_email_error ?? null,
+      approval_email_sent_at: payload.approval_email_sent_at ?? null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export type ApprovalEmailResult = {
+  sent: boolean;
+  skipped?: boolean;
+  error?: string;
+};
+
+export async function sendApprovalEmailForApplication(
+  application: MembershipApplicationRecord
+): Promise<ApprovalEmailResult> {
+  if (!isValidApplicantEmail(application.email)) {
+    const error = "Invalid email address";
+    await updateMembershipApplicationApprovalEmailStatus(application.id, {
+      approval_email_status: "skipped",
+      approval_email_error: error,
+      approval_email_sent_at: null,
+    });
+
+    return { sent: false, skipped: true, error };
+  }
+
+  try {
+    await sendMembershipApprovalEmail(application);
+    const sentAt = new Date().toISOString();
+    await updateMembershipApplicationApprovalEmailStatus(application.id, {
+      approval_email_status: "sent",
+      approval_email_error: null,
+      approval_email_sent_at: sentAt,
+    });
+
+    return { sent: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to send approval email";
+
+    await updateMembershipApplicationApprovalEmailStatus(application.id, {
+      approval_email_status: "failed",
+      approval_email_error: message,
+      approval_email_sent_at: null,
+    });
+
+    return { sent: false, error: message };
+  }
+}
+
+export async function getMembershipApplicationById(id: string) {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("membership_applications")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as MembershipApplicationRecord;
 }
 
 export async function listMembershipApplications() {

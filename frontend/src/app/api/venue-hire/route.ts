@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { sendVenueHireEmail } from '@/app/venue-hire/utils/email';
 import { checkRateLimit, getClientIp } from '@/app/utils/rateLimit';
+import {
+  createVenueHireApplication,
+  updateVenueHireApplicationEmailStatus,
+} from '@/lib/venue-applications/venue-hire';
 
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_REQUESTS = 10; // Maximum requests per window
@@ -57,11 +61,33 @@ export async function POST(request: Request) {
     
     // Validate the data
     const validatedData = formSchema.parse(data);
+    const application = await createVenueHireApplication(validatedData);
 
-    // Send email
-    await sendVenueHireEmail(validatedData);
+    try {
+      await sendVenueHireEmail(validatedData);
+      try {
+        await updateVenueHireApplicationEmailStatus(application.id, {
+          email_status: 'sent',
+        });
+      } catch (statusError) {
+        console.error('Venue hire email status update error:', statusError);
+      }
+    } catch (emailError) {
+      console.error('Venue hire email notification error:', emailError);
+      try {
+        await updateVenueHireApplicationEmailStatus(application.id, {
+          email_status: 'failed',
+          email_error:
+            emailError instanceof Error
+              ? emailError.message
+              : 'Failed to send venue hire email',
+        });
+      } catch (statusError) {
+        console.error('Venue hire email status update error:', statusError);
+      }
+    }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, applicationId: application.id });
   } catch (error) {
     console.error('Venue hire form submission error:', error);
     if (error instanceof z.ZodError) {
@@ -75,4 +101,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}

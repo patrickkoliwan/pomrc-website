@@ -4,22 +4,22 @@ import {
   classifyPublishedEvents,
   mapClubEvent,
 } from "@/lib/events/classify-events";
-import { getPublishedEvents } from "@/lib/cms/public-data";
+import { getPublishedEventsOrNull } from "@/lib/cms/public-data";
 import { hasSupabasePublicConfig } from "@/lib/supabase/server";
 
 export const revalidate = 3600;
 
 export default async function Events() {
-  const cmsEvents = await getPublishedEvents();
   const useCmsEvents = hasSupabasePublicConfig();
-  const { weekly, upcoming, recent } = classifyPublishedEvents(cmsEvents);
-  const displayedWeeklyEvents = useCmsEvents
+  const cmsEvents = useCmsEvents ? await getPublishedEventsOrNull() : null;
+  const { weekly, upcoming, recent } = classifyPublishedEvents(cmsEvents ?? []);
+  const displayedWeeklyEvents = cmsEvents
     ? weekly.map(mapClubEvent)
     : weeklyEvents;
-  const displayedUpcomingEvents = useCmsEvents
+  const displayedUpcomingEvents = cmsEvents
     ? upcoming.map(mapClubEvent)
     : upcomingEvents;
-  const displayedRecentEvents = useCmsEvents ? recent.map(mapClubEvent) : [];
+  const displayedRecentEvents = cmsEvents ? recent.map(mapClubEvent) : [];
   const hasRecentEvents = displayedRecentEvents.length > 0;
 
   return (

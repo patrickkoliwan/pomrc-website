@@ -15,19 +15,24 @@ import type {
 async function publicSelect<T>(
   table: string,
   orderColumn = "display_order"
-): Promise<T[]> {
+): Promise<T[] | null> {
   const supabase = getSupabasePublicClient();
 
   if (!supabase) {
-    return [];
+    return null;
   }
 
   const query = supabase.from(table).select("*").eq("published", true);
   const { data, error } = await query.order(orderColumn, { ascending: true });
 
   if (error) {
-    console.error(`Failed to read ${table} from Supabase`, error);
-    return [];
+    console.error(`Failed to read ${table} from Supabase`, {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
+    return null;
   }
 
   return (data || []) as T[];
@@ -38,15 +43,19 @@ function isMissingRelationError(error: { code?: string }) {
 }
 
 export async function getPublishedFacilities() {
-  return publicSelect<FacilityRecord>("facilities");
+  return (await publicSelect<FacilityRecord>("facilities")) ?? [];
 }
 
 export async function getPublishedEvents() {
+  return (await publicSelect<ClubEventRecord>("club_events")) ?? [];
+}
+
+export async function getPublishedEventsOrNull() {
   return publicSelect<ClubEventRecord>("club_events");
 }
 
 export async function getPublishedJuniorPrograms() {
-  return publicSelect<JuniorProgramRecord>("junior_programs");
+  return (await publicSelect<JuniorProgramRecord>("junior_programs")) ?? [];
 }
 
 export async function getPublishedJuniorProgramNotice() {
@@ -76,7 +85,7 @@ export async function getPublishedJuniorProgramNotice() {
 }
 
 export async function getPublishedCommitteeMembers() {
-  return publicSelect<CommitteeMemberRecord>("committee_members");
+  return (await publicSelect<CommitteeMemberRecord>("committee_members")) ?? [];
 }
 
 export async function getPublishedCommitteePositions() {

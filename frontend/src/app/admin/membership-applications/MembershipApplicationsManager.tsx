@@ -3,6 +3,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   applicationStatusLabels,
+  approvalEmailStatusLabels,
   emailStatusLabels,
   filterMembershipApplications,
   getApplicationListBorderClassName,
@@ -16,6 +17,7 @@ import {
   type MembershipApplicationStatus,
   type MembershipPaymentStatus,
 } from "@/lib/membership/types";
+import { isValidApplicantEmail } from "@/lib/membership/email-validation";
 import type { MembershipFormData } from "@/app/membership/utils/types";
 import {
   Dialog,
@@ -31,6 +33,12 @@ type EditableFields = {
   status: MembershipApplicationStatus;
   payment_status: MembershipPaymentStatus;
   admin_notes: string;
+};
+
+type ApprovalEmailResponse = {
+  sent: boolean;
+  skipped?: boolean;
+  error?: string;
 };
 
 const filterOptions: Array<{ value: ApplicationListFilter; label: string }> = [
@@ -59,6 +67,7 @@ export default function MembershipApplicationsManager({
     admin_notes: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,6 +93,7 @@ export default function MembershipApplicationsManager({
     setSelectedId(application.id);
     setEditing(toEditableFields(application));
     setIsSaving(false);
+    setIsSendingEmail(false);
     setToastMessage(null);
     setError(null);
     setReviewOpen(true);
@@ -94,6 +104,7 @@ export default function MembershipApplicationsManager({
     setDetailsOpen(false);
     setSelectedId(null);
     setIsSaving(false);
+    setIsSendingEmail(false);
     setToastMessage(null);
     setError(null);
   }
@@ -131,7 +142,49 @@ export default function MembershipApplicationsManager({
     );
     setEditing(toEditableFields(result.data));
     setIsSaving(false);
-    setToastMessage("Review saved");
+    setToastMessage(
+      getSaveReviewToastMessage(result.data, result.approvalEmail)
+    );
+  }
+
+  async function sendApprovalEmail() {
+    if (!selected) return;
+
+    setIsSendingEmail(true);
+    setError(null);
+
+    const response = await fetch(
+      `/api/admin/membership-applications/${selected.id}/send-approval-email`,
+      { method: "POST" }
+    );
+    const result = await response.json();
+
+    if (result.data) {
+      setItems((current) =>
+        sortMembershipApplications(
+          current.map((item) =>
+            item.id === result.data.id ? result.data : item
+          )
+        )
+      );
+    }
+
+    setIsSendingEmail(false);
+
+    if (response.ok && result.approvalEmail?.sent) {
+      setToastMessage(`Approval email sent to ${selected.email}.`);
+      return;
+    }
+
+    if (result.approvalEmail?.skipped) {
+      setError(
+        result.error ||
+          "Approval email not sent — invalid email address. Contact the applicant by phone."
+      );
+      return;
+    }
+
+    setError(result.error || "Failed to send approval email");
   }
 
   if (items.length === 0) {
@@ -150,6 +203,7 @@ export default function MembershipApplicationsManager({
         message={toastMessage ?? ""}
         open={toastMessage !== null}
         onClose={() => setToastMessage(null)}
+        duration={5000}
       />
       <section className="rounded-lg bg-white p-4 shadow-sm sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -303,6 +357,22 @@ export default function MembershipApplicationsManager({
                   />
                 </FieldFrame>
 
+                {selected.status === "approved" && (
+                  <ApprovalEmailSection
+                    application={selected}
+                    isSendingEmail={isSendingEmail}
+                    onSendApprovalEmail={sendApprovalEmail}
+                  />
+                )}
+
+                {editing.status === "approved" &&
+                  selected.status !== "approved" && (
+                    <p className="rounded-md border border-muted-teal/30 bg-light-teal px-3 py-2 text-sm text-dark-teal/75">
+                      Save the review as approved to send the approval email
+                      automatically.
+                    </p>
+                  )}
+
                 {error && <p className="text-sm text-deep-red">{error}</p>}
 
                 <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
@@ -395,8 +465,13 @@ function ApplicationDetails({
                 ? `K${application.quoted_amount}`
                 : null),
           ],
-          ["Email notification", emailStatusLabels[application.email_status]],
-          ["Email error", application.email_error],
+          ["Submission notification", emailStatusLabels[application.email_status]],
+          ["Submission email error", application.email_error],
+          [
+            "Approval email",
+            formatApprovalEmailStatus(application),
+          ],
+          ["Approval email error", application.approval_email_error],
         ]}
       />
       <EndorsementsDetails data={data} />
@@ -526,6 +601,104 @@ function FieldFrame({
       <div className="mt-2">{children}</div>
     </div>
   );
+}
+
+function ApprovalEmailSection({
+  application,
+  isSendingEmail,
+  onSendApprovalEmail,
+}: {
+  application: MembershipApplicationRecord;
+  isSendingEmail: boolean;
+  onSendApprovalEmail: () => void;
+}) {
+  const hasValidEmail = isValidApplicantEmail(application.email);
+  const approvalEmailStatus = application.approval_email_status ?? "not_sent";
+  const statusLabel =
+    approvalEmailStatusLabels[approvalEmailStatus] ?? approvalEmailStatus;
+
+  return (
+    <div className="space-y-3 rounded-md border border-muted-teal/30 bg-white p-4">
+      <div>
+        <h3 className="text-sm font-semibold text-dark-teal">Approval email</h3>
+        <p className="mt-1 text-sm text-dark-teal/75">
+          Applicant email:{" "}
+          <span className="font-medium text-dark-teal">{application.email}</span>
+        </p>
+      </div>
+
+      {!hasValidEmail && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          This application does not have a valid email address. Approval email
+          cannot be sent — contact the applicant by phone on{" "}
+          <span className="font-medium">{application.phone}</span>.
+        </p>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <ApplicationStatusBadge
+          label={`Approval email: ${statusLabel}`}
+          className={
+            approvalEmailStatus === "sent"
+              ? "bg-green-100 text-green-800"
+              : approvalEmailStatus === "failed"
+                ? "bg-red-100 text-red-800"
+                : approvalEmailStatus === "skipped"
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-light-teal text-dark-teal"
+          }
+        />
+        {application.approval_email_sent_at && (
+          <span className="text-xs text-muted-teal">
+            Sent {formatDate(application.approval_email_sent_at)}
+          </span>
+        )}
+      </div>
+
+      {application.approval_email_error && (
+        <p className="text-sm text-deep-red">{application.approval_email_error}</p>
+      )}
+
+      <button
+        type="button"
+        onClick={onSendApprovalEmail}
+        disabled={!hasValidEmail || isSendingEmail}
+        className="rounded-md border border-dark-teal px-4 py-2 text-sm font-semibold text-dark-teal hover:bg-light-teal disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isSendingEmail ? "Sending..." : "Send approval email"}
+      </button>
+    </div>
+  );
+}
+
+function getSaveReviewToastMessage(
+  application: MembershipApplicationRecord,
+  approvalEmail?: ApprovalEmailResponse
+) {
+  if (!approvalEmail) {
+    return "Review saved";
+  }
+
+  if (approvalEmail.sent) {
+    return `Review saved. Approval email sent to ${application.email}.`;
+  }
+
+  if (approvalEmail.skipped) {
+    return "Review saved. Approval email not sent — invalid email address.";
+  }
+
+  return "Review saved. Approval email failed to send — check status below.";
+}
+
+function formatApprovalEmailStatus(application: MembershipApplicationRecord) {
+  const approvalEmailStatus = application.approval_email_status ?? "not_sent";
+  const label = approvalEmailStatusLabels[approvalEmailStatus];
+
+  if (application.approval_email_sent_at) {
+    return `${label} (${formatDate(application.approval_email_sent_at)})`;
+  }
+
+  return label;
 }
 
 function toEditableFields(

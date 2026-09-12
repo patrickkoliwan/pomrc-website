@@ -25,8 +25,8 @@ export default async function JuniorPrograms() {
   const squashPrograms = groupedPrograms.squash;
   const otherPrograms = groupedPrograms.other;
   const visibleSections = [
-    tennisPrograms.length > 0 && { href: "#tennis", label: "Tennis Programs" },
-    squashPrograms.length > 0 && { href: "#squash", label: "Squash Programs" },
+    { href: "#tennis", label: "Tennis Programs" },
+    { href: "#squash", label: "Squash Programs" },
     otherPrograms.length > 0 && { href: "#other", label: "Other Programs" },
   ].filter(Boolean) as { href: string; label: string }[];
 
@@ -62,27 +62,27 @@ export default async function JuniorPrograms() {
 
         <JuniorProgramNotice notice={notice} />
 
-        {tennisPrograms.length > 0 && (
-          <section id="tennis" className="mb-16 scroll-mt-24">
-            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
-                Tennis Programs
-              </h2>
-              <div className="prose max-w-none">
-                <p className="text-lg text-gray-700 mb-6">
-                  Our junior tennis training prepares children from age ten
-                  onwards for competitive play at the highest level. We focus on
-                  building strong foundations for the West Pacific Qualifiers
-                  (WPQ), which begin at the under-12 category. Success at the
-                  WPQ opens doors to the Pacific Oceania Junior Championships,
-                  where top finishers may qualify for further opportunities in
-                  Pacific Oceania junior touring events. Join us to start your
-                  child&apos;s journey toward tennis excellence on the
-                  international stage.
-                </p>
-              </div>
+        <section id="tennis" className="mb-16 scroll-mt-24">
+          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
+              Tennis Programs
+            </h2>
+            <div className="prose max-w-none">
+              <p className="text-lg text-gray-700 mb-6">
+                Our junior tennis training prepares children from age ten
+                onwards for competitive play at the highest level. We focus on
+                building strong foundations for the West Pacific Qualifiers
+                (WPQ), which begin at the under-12 category. Success at the
+                WPQ opens doors to the Pacific Oceania Junior Championships,
+                where top finishers may qualify for further opportunities in
+                Pacific Oceania junior touring events. Join us to start your
+                child&apos;s journey toward tennis excellence on the
+                international stage.
+              </p>
             </div>
+          </div>
 
+          {tennisPrograms.length > 0 ? (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {tennisPrograms.map((program, index) => (
                 <ProgramCard
@@ -92,30 +92,36 @@ export default async function JuniorPrograms() {
                 />
               ))}
             </div>
-          </section>
-        )}
-
-        {squashPrograms.length > 0 && (
-          <section id="squash" className="mb-16 scroll-mt-24">
-            <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
-                Squash Programs
-              </h2>
-              <div className="prose max-w-none">
-                <p className="text-lg text-gray-700 mb-6">
-                  The Squash Junior Development Elite program offers weekly
-                  dedicated training sessions for juniors aspiring to compete at
-                  regional and international levels. Our program creates clear
-                  pathways to prestigious competitions including the Oceania
-                  Junior Championships and Australian Junior Open. POMRC Squash
-                  Juniors have proudly represented PNG at the 2018 Commonwealth
-                  Games, 2019 Pacific Games, and 2022 Birmingham Commonwealth
-                  Games. Endorsed by the PNG Squash Rackets Federation, our
-                  program is your child&apos;s gateway to sporting excellence.
-                </p>
-              </div>
+          ) : (
+            <div className="rounded-lg border border-muted-teal/30 bg-light-teal p-8 text-center">
+              <p className="text-lg text-muted-teal">
+                Stay tuned for upcoming tennis programs.
+              </p>
             </div>
+          )}
+        </section>
 
+        <section id="squash" className="mb-16 scroll-mt-24">
+          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-dark-teal mb-4">
+              Squash Programs
+            </h2>
+            <div className="prose max-w-none">
+              <p className="text-lg text-gray-700 mb-6">
+                The Squash Junior Development Elite program offers weekly
+                dedicated training sessions for juniors aspiring to compete at
+                regional and international levels. Our program creates clear
+                pathways to prestigious competitions including the Oceania
+                Junior Championships and Australian Junior Open. POMRC Squash
+                Juniors have proudly represented PNG at the 2018 Commonwealth
+                Games, 2019 Pacific Games, and 2022 Birmingham Commonwealth
+                Games. Endorsed by the PNG Squash Rackets Federation, our
+                program is your child&apos;s gateway to sporting excellence.
+              </p>
+            </div>
+          </div>
+
+          {squashPrograms.length > 0 ? (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {squashPrograms.map((program, index) => (
                 <ProgramCard
@@ -125,8 +131,14 @@ export default async function JuniorPrograms() {
                 />
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <div className="rounded-lg border border-muted-teal/30 bg-light-teal p-8 text-center">
+              <p className="text-lg text-muted-teal">
+                Stay tuned for upcoming squash programs.
+              </p>
+            </div>
+          )}
+        </section>
 
         {otherPrograms.length > 0 && (
           <section id="other" className="scroll-mt-24">

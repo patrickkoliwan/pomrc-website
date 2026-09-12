@@ -6,6 +6,11 @@ export const adminSections = [
       "Review submitted applications and track approval and payment status.",
   },
   {
+    href: "/admin/venue-applications",
+    label: "Venue & Filming Applications",
+    description: "Review venue hire requests and filming applications.",
+  },
+  {
     href: "/admin/events",
     label: "Events",
     description: "Publish regular activities, dated events, and event times.",

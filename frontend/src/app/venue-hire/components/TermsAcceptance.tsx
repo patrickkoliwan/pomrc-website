@@ -8,6 +8,7 @@ interface TermsAcceptanceProps {
   errors: FieldErrors<FormData>;
   hasAcceptedFullTerms: boolean;
   onReadFullTerms: () => void;
+  termsWarning?: string | null;
   isLoading?: boolean;
 }
 
@@ -16,12 +17,21 @@ export default function TermsAcceptance({
   errors,
   hasAcceptedFullTerms,
   onReadFullTerms,
+  termsWarning,
   isLoading = false,
 }: TermsAcceptanceProps) {
   if (isLoading) return null; // Don't show acceptance checkbox while loading
 
   return (
     <div className="space-y-2">
+      {termsWarning && (
+        <div
+          role="alert"
+          className="rounded-md border border-deep-red/30 bg-deep-red/10 px-4 py-3 text-sm text-deep-red"
+        >
+          {termsWarning}
+        </div>
+      )}
       <div className="flex items-start space-x-2">
         <input
           type="checkbox"

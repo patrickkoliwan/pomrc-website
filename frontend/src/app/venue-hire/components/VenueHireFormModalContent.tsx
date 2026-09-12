@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   UseFormRegister,
   FieldErrors,
@@ -42,14 +42,62 @@ export default function VenueHireFormModalContent({
 }: VenueHireFormModalContentProps) {
   // State for inline terms view
   const [isViewingFullTerms, setIsViewingFullTerms] = useState(false);
+  const [hasOpenedFullTerms, setHasOpenedFullTerms] = useState(false);
   const [hasAcceptedFullTerms, setHasAcceptedFullTerms] = useState(false);
+  const [showTermsWarning, setShowTermsWarning] = useState(false);
   const termsAccepted = watch("termsAccepted");
-  const canSubmit = termsAccepted && hasAcceptedFullTerms && !isSubmitting;
+
+  const getTermsWarningMessage = () => {
+    if (!hasOpenedFullTerms) {
+      return "Please open and read the full terms and conditions before submitting your request.";
+    }
+    if (!hasAcceptedFullTerms) {
+      return "Please accept the full terms and conditions before submitting your request.";
+    }
+    if (!termsAccepted) {
+      return "Please confirm that you agree to the terms and conditions by checking the box below.";
+    }
+    return null;
+  };
+
+  const termsWarning = showTermsWarning ? getTermsWarningMessage() : null;
+
+  useEffect(() => {
+    if (termsAccepted && !hasAcceptedFullTerms) {
+      setShowTermsWarning(true);
+    }
+  }, [termsAccepted, hasAcceptedFullTerms]);
+
+  useEffect(() => {
+    if (hasAcceptedFullTerms && termsAccepted) {
+      setShowTermsWarning(false);
+    }
+  }, [hasAcceptedFullTerms, termsAccepted]);
+
+  const handleOpenFullTerms = () => {
+    setHasOpenedFullTerms(true);
+    setIsViewingFullTerms(true);
+  };
 
   const handleAcceptFullTerms = () => {
     setHasAcceptedFullTerms(true);
-    setIsViewingFullTerms(false); // Go back to form view
+    setIsViewingFullTerms(false);
   };
+
+  const handleFormSubmit = handleSubmit(
+    (data) => {
+      if (!hasOpenedFullTerms || !hasAcceptedFullTerms || !termsAccepted) {
+        setShowTermsWarning(true);
+        return;
+      }
+      onSubmit(data);
+    },
+    () => {
+      if (!hasOpenedFullTerms || !hasAcceptedFullTerms || !termsAccepted) {
+        setShowTermsWarning(true);
+      }
+    }
+  );
 
   if (isLoading) {
     return (
@@ -92,7 +140,7 @@ export default function VenueHireFormModalContent({
 
   // Render the Form View
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <div className="grid grid-cols-1 gap-6">
         <PersonalInfo register={register} errors={errors} />
         <EventDetails register={register} errors={errors} />
@@ -101,7 +149,8 @@ export default function VenueHireFormModalContent({
           register={register}
           errors={errors}
           hasAcceptedFullTerms={hasAcceptedFullTerms}
-          onReadFullTerms={() => setIsViewingFullTerms(true)}
+          onReadFullTerms={handleOpenFullTerms}
+          termsWarning={termsWarning}
         />
       </div>
 
@@ -115,7 +164,7 @@ export default function VenueHireFormModalContent({
         </Button>
         <Button
           type="submit"
-          disabled={!canSubmit}
+          disabled={isSubmitting}
           className="bg-deep-red hover:bg-deep-red/80 text-light-cream"
         >
           {isSubmitting ? <LoadingSpinner /> : "Submit Request"}

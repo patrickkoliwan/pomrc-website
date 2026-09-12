@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/firebase/admin";
 import {
-  getMembershipApplicationById,
-  membershipApplicationUpdateSchema,
-  sendApprovalEmailForApplication,
-  updateMembershipApplication,
+  getVenueHireApplicationById,
+  sendApprovalEmailForVenueHireApplication,
+  updateVenueHireApplication,
+  venueHireApplicationUpdateSchema,
   type ApprovalEmailResult,
-} from "@/lib/membership/applications";
+} from "@/lib/venue-applications/venue-hire";
 
 export async function PUT(
   request: Request,
@@ -17,11 +17,11 @@ export async function PUT(
 
   try {
     const { id } = await context.params;
-    const currentApplication = await getMembershipApplicationById(id);
-    const payload = membershipApplicationUpdateSchema.parse(
+    const currentApplication = await getVenueHireApplicationById(id);
+    const payload = venueHireApplicationUpdateSchema.parse(
       await request.json()
     );
-    const data = await updateMembershipApplication(id, payload);
+    const data = await updateVenueHireApplication(id, payload);
 
     let approvalEmail: ApprovalEmailResult | undefined;
 
@@ -29,8 +29,8 @@ export async function PUT(
       currentApplication.status !== "approved" &&
       payload.status === "approved"
     ) {
-      approvalEmail = await sendApprovalEmailForApplication(data);
-      const refreshed = await getMembershipApplicationById(id);
+      approvalEmail = await sendApprovalEmailForVenueHireApplication(data);
+      const refreshed = await getVenueHireApplicationById(id);
 
       return NextResponse.json({
         data: refreshed,
@@ -42,7 +42,10 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid membership application payload", details: error.errors },
+        {
+          error: "Invalid venue hire application payload",
+          details: error.errors,
+        },
         { status: 400 }
       );
     }
